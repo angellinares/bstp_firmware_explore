@@ -34,6 +34,12 @@
   #status.ok { color: var(--ok); }
   #status.bad { color: var(--accent); font-weight: 600; }
   code { font-size: .85em; word-break: break-all; }
+  .warn + .warn { margin-top: 8px; }
+  dialog { max-width: 460px; border: 1px solid var(--line); border-radius: 8px; padding: 20px;
+           background: var(--card); color: var(--fg); }
+  dialog::backdrop { background: rgba(0, 0, 0, .55); }
+  dialog h2 { margin-top: 0; }
+  button.quiet { background: none; color: var(--fg); border: 1px solid var(--line); }
 </style>
 </head>
 <body>
@@ -43,6 +49,9 @@
   <p class="warn">Modified firmware can leave your BeatStep Pro unusable, and you install it at your own risk.
     Before installing anything from here, install Arturia's own 2.0.1.6 file once with MIDI Control Center,
     so you know the way back works on your unit.</p>
+  <p class="warn"><b>Back up all your projects first.</b> Use MIDI Control Center to save every project on the
+    unit to your computer before you install custom firmware. A mod changes how patterns are stored, and a
+    fault could damage or erase them.</p>
 
   <h2>1. Your firmware file</h2>
   <p>Choose <code>BeatStepPro_Firmware_Update_2_0_1_6.led</code>, from Arturia's downloads page.
@@ -57,6 +66,13 @@
   <h2>3. Build</h2>
   <p><button id="build" disabled>Build the update file</button>
     <a id="download" class="button" hidden>Download</a></p>
+  <dialog id="backup" aria-labelledby="backupTitle">
+    <h2 id="backupTitle">Have you backed up your projects?</h2>
+    <p>Before you install custom firmware, save every project on the BeatStep Pro to your computer with
+      MIDI Control Center. A mod changes how patterns are stored, and a fault could damage or erase them.</p>
+    <p><button id="backupYes">I have a backup: download</button>
+      <button id="backupNo" class="quiet">Not yet</button></p>
+  </dialog>
   <p id="result" class="dim" role="status"></p>
 
   <h2>Installing, and going back</h2>
@@ -130,6 +146,20 @@
     $("drop").addEventListener(type, (e) => { e.preventDefault(); $("drop").classList.remove("over"); });
   }
   $("drop").addEventListener("drop", (e) => e.dataTransfer.files[0] && openFile(e.dataTransfer.files[0]));
+
+  // The download asks about a backup first; "Not yet" leaves the link where it is.
+  let backedUp = false;
+  $("download").addEventListener("click", (e) => {
+    if (backedUp) { backedUp = false; return; }
+    e.preventDefault();
+    $("backup").showModal();
+  });
+  $("backupNo").addEventListener("click", () => $("backup").close());
+  $("backupYes").addEventListener("click", () => {
+    $("backup").close();
+    backedUp = true;
+    $("download").click();
+  });
 
   $("build").addEventListener("click", async () => {
     const mod = PATCHES.mods[document.querySelector("input[name=mod]:checked").value];

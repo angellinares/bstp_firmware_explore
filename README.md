@@ -11,8 +11,10 @@ nothing is uploaded, and the page only offers a file that is byte for byte a
 build tested here. You install it with MIDI Control Center, like any update.
 
 > Modified firmware can leave your unit unusable, and you install it at your own
-> risk. Back up your projects first, and install Arturia's own 2.0.1.6 file once
-> before anything from here, so you know the way back works on your unit.
+> risk. **Back up all your projects with MIDI Control Center first**: a mod
+> changes how patterns are stored, and a fault could damage or erase them. Then
+> install Arturia's own 2.0.1.6 file once before anything from here, so you know
+> the way back works on your unit.
 
 ## The mods
 
