@@ -1,0 +1,36 @@
+{
+ "trig": {
+  "name": "Step chance and conditions",
+  "page": true,
+  "hardware": "1.2.0 tested on a device, 2026-10-13",
+  "summary": "Each SEQ1, SEQ2 and DRUM step can have a chance to play (hold the step, turn Randomness) or a condition such as every second pass (hold the step, turn Probability).",
+  "changes": [
+   ["1.2.1", "2026-10-13", "Chance and conditions on DRUM steps too, set on the selected pad's steps and saved with the drum pattern. Each pad counts the passes of its own length. Copy project carries them."],
+   ["1.2.0", "2026-10-13", "Step conditions on SEQ1 and SEQ2: hold a step and turn Probability. 1-1 is none, 1St and n1S are first pass only and not first pass, A-B plays on pass A of every B, nAB on every pass but that one, for B up to 4."],
+   ["1.1.0", "2026-10-13", "The chance of a held step is now set with the Randomness knob. Probability is left as stock, kept for per-step conditions."],
+   ["1.0.0", "2026-10-13", "First version: per-step trigger chance, saved with the pattern."]
+  ]
+ },
+ "poly": {
+  "name": "Chords (with step chance and conditions)",
+  "page": true,
+  "hardware": "not run on a device yet",
+  "summary": "Up to four notes on a SEQ1 or SEQ2 step. Includes step chance and conditions. Chords are saved in a part of the storage chip the stock firmware does not use.",
+  "changes": [
+   ["1.2.1", "2026-10-13", "Step chance and conditions 1.2.1: also on DRUM steps."],
+   ["1.2.0", "2026-10-13", "Step conditions 1.2.0: hold a step and turn Probability."],
+   ["1.1.0", "2026-10-13", "Trigger chance 1.1.0: the chance of a held step is now set with the Randomness knob."],
+   ["1.0.0", "2026-10-13", "First version: chords of up to four notes a step, with trigger chance 1.0.0."]
+  ]
+ },
+ "dump": {
+  "name": "Bootloader dump",
+  "page": false,
+  "hardware": "1.0.1 tested on a device, 2026-10-13",
+  "summary": "Sends the bootloader over USB MIDI when Probability is turned. A one-off tool, not for playing.",
+  "changes": [
+   ["1.0.1", "2026-10-13", "Fix: 1.0.0 sent the dump out of the 5-pin MIDI output instead of USB. Now sent over USB, and a message the USB queue refuses is sent again."],
+   ["1.0.0", "2026-10-13", "First version."]
+  ]
+ }
+}

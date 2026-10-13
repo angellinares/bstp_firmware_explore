@@ -1,0 +1,29 @@
+# Other people's material, not ours to redistribute: Arturia firmware and
+# manuals, ST datasheets.
+00_Resources/
+
+# Everything here is made from Arturia's firmware (unpacked images, Ghidra
+# output, decompiled code, patched images that contain the stock code) or is
+# read off the device (out/bootloader).
+out/
+
+# Firmware and dumps wherever they land.
+*.led
+*.kspf
+*.kspf.zip
+*.bin
+*.elf
+*.gpr
+*.rep/
+fw.sqlite
+
+# Local
+.venv/
+__pycache__/
+.pytest_cache/
+.claude/settings.local.json
+
+# Our notes on the stock firmware and the names we gave its functions: kept
+# on this machine for now, not published.
+docs/firmware-map.md
+symbols/

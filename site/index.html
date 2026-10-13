@@ -1,0 +1,152 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>BeatStep Pro mods</title>
+<style>
+  :root { --bg: #f6f5f1; --fg: #1c1c1a; --dim: #66655f; --line: #d5d3ca; --card: #fff; --accent: #b3401f; --ok: #256b3a; }
+  @media (prefers-color-scheme: dark) {
+    :root { --bg: #171715; --fg: #ecebe6; --dim: #a3a199; --line: #3a3934; --card: #20201d; --accent: #f08a5d; --ok: #7ec994; }
+  }
+  body { margin: 0; background: var(--bg); color: var(--fg); font: 16px/1.5 system-ui, sans-serif; }
+  main { max-width: 720px; margin: 0 auto; padding: 24px 16px 64px; }
+  h1 { font-size: 1.6rem; margin: 0 0 4px; }
+  h2 { font-size: 1.1rem; margin: 32px 0 8px; }
+  p { margin: 8px 0; }
+  .dim { color: var(--dim); }
+  .warn { border-left: 4px solid var(--accent); padding: 8px 12px; background: var(--card); }
+  #drop { display: block; border: 2px dashed var(--line); border-radius: 8px; padding: 28px 16px; text-align: center;
+          background: var(--card); cursor: pointer; }
+  #drop.over, #drop:focus-within { border-color: var(--accent); }
+  .mod { display: block; border: 1px solid var(--line); border-radius: 8px; padding: 12px 14px; margin: 8px 0;
+         background: var(--card); }
+  .mod:has(input:checked) { border-color: var(--accent); }
+  .mod b { font-size: 1.05rem; }
+  .tag { font-size: .8rem; border: 1px solid var(--line); border-radius: 99px; padding: 1px 8px; margin-left: 6px; }
+  details { margin-top: 6px; }
+  summary { cursor: pointer; color: var(--dim); }
+  ul { margin: 4px 0; padding-left: 20px; }
+  button, a.button { font: inherit; padding: 10px 18px; border-radius: 8px; border: 0; background: var(--accent);
+                     color: var(--bg); cursor: pointer; text-decoration: none; display: inline-block; }
+  button:disabled { opacity: .4; cursor: default; }
+  #status { min-height: 1.5em; }
+  #status.ok { color: var(--ok); }
+  #status.bad { color: var(--accent); font-weight: 600; }
+  code { font-size: .85em; word-break: break-all; }
+</style>
+</head>
+<body>
+<main>
+  <h1>BeatStep Pro mods</h1>
+  <p class="dim">Unofficial changes to Arturia's BeatStep Pro firmware 2.0.1.6. Not made or supported by Arturia.</p>
+  <p class="warn">Modified firmware can leave your BeatStep Pro unusable, and you install it at your own risk.
+    Before installing anything from here, install Arturia's own 2.0.1.6 file once with MIDI Control Center,
+    so you know the way back works on your unit.</p>
+
+  <h2>1. Your firmware file</h2>
+  <p>Choose <code>BeatStepPro_Firmware_Update_2_0_1_6.led</code>, from Arturia's downloads page.
+    It stays on your computer: this page sends nothing anywhere.</p>
+  <label id="drop">Drop the .led file here, or click to choose
+    <input id="file" type="file" accept=".led" hidden></label>
+  <p id="status" role="status"></p>
+
+  <h2>2. The mod</h2>
+  <div id="mods"></div>
+
+  <h2>3. Build</h2>
+  <p><button id="build" disabled>Build the update file</button>
+    <a id="download" class="button" hidden>Download</a></p>
+  <p id="result" class="dim" role="status"></p>
+
+  <h2>Installing, and going back</h2>
+  <p>Install the downloaded file with MIDI Control Center, the same way as an Arturia update.
+    To go back, install Arturia's original file the same way. If the unit does not start, hold
+    PLAY + STOP + RECORD while switching it on to reach the updater.</p>
+  <p class="dim">The file name and the firmware inside both carry the mod and its version,
+    so a file can always be traced to the entry in its changelog above.</p>
+</main>
+<script src="patches.js"></script>
+<script src="patch.js"></script>
+<script>
+  const $ = (id) => document.getElementById(id);
+  let stock = null;
+
+  for (const [n, mod] of PATCHES.mods.entries()) {
+    const label = document.createElement("label");
+    label.className = "mod";
+    const radio = Object.assign(document.createElement("input"), { type: "radio", name: "mod", value: n, checked: n === 0 });
+    const name = Object.assign(document.createElement("b"), { textContent: " " + mod.name });
+    const version = Object.assign(document.createElement("span"), { className: "tag", textContent: "v" + mod.version });
+    const tested = Object.assign(document.createElement("span"), { className: "tag", textContent: mod.hardware });
+    const summary = Object.assign(document.createElement("p"), { textContent: mod.summary });
+    const log = document.createElement("details");
+    log.append(Object.assign(document.createElement("summary"), { textContent: "Changelog" }));
+    const list = document.createElement("ul");
+    for (const [v, date, text] of mod.changes) {
+      list.append(Object.assign(document.createElement("li"), { textContent: `${v} (${date}): ${text}` }));
+    }
+    log.append(list);
+    label.append(radio, name, version, tested, summary, log);
+    $("mods").append(label);
+    radio.addEventListener("change", reset);
+  }
+
+  function say(text, kind) {
+    $("status").textContent = text;
+    $("status").className = kind;
+  }
+
+  function reset() {
+    $("download").hidden = true;
+    $("result").textContent = "";
+  }
+
+  async function openFile(file) {
+    stock = null;
+    reset();
+    $("build").disabled = true;
+    try {
+      const bytes = fromHex(await file.text());
+      if (await sha256(bytes) !== PATCHES.stock_sha256) {
+        const stamp = readStamp(bytes, PATCHES);
+        throw new Error(stamp
+          ? `this file is already patched (${stamp}); use the original file from Arturia`
+          : `this is not Arturia's ${PATCHES.firmware} update file`);
+      }
+      stock = bytes;
+      $("build").disabled = false;
+      say(`${file.name}: Arturia's ${PATCHES.firmware} file, unmodified.`, "ok");
+    } catch (e) {
+      say(`${file.name}: ${e.message}.`, "bad");
+    }
+  }
+
+  $("file").addEventListener("change", (e) => e.target.files[0] && openFile(e.target.files[0]));
+  for (const type of ["dragenter", "dragover"]) {
+    $("drop").addEventListener(type, (e) => { e.preventDefault(); $("drop").classList.add("over"); });
+  }
+  for (const type of ["dragleave", "drop"]) {
+    $("drop").addEventListener(type, (e) => { e.preventDefault(); $("drop").classList.remove("over"); });
+  }
+  $("drop").addEventListener("drop", (e) => e.dataTransfer.files[0] && openFile(e.dataTransfer.files[0]));
+
+  $("build").addEventListener("click", async () => {
+    const mod = PATCHES.mods[document.querySelector("input[name=mod]:checked").value];
+    reset();
+    try {
+      const built = await patch(stock, PATCHES, mod);
+      const link = $("download");
+      URL.revokeObjectURL(link.href);
+      link.href = URL.createObjectURL(new Blob([toHex(built)], { type: "application/octet-stream" }));
+      link.download = `BeatStepPro_2.0.1.6_${mod.id}-${mod.version}.led`;
+      link.textContent = "Download " + link.download;
+      link.hidden = false;
+      $("result").textContent = `Contains "${readStamp(built, PATCHES)}". SHA-256 of the file: ${mod.file_sha256}`;
+    } catch (e) {
+      $("result").textContent = "Not built: " + e.message + ".";
+    }
+  });
+</script>
+</body>
+</html>

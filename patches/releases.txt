@@ -1,0 +1,9 @@
+# Every version built, oldest first: date, mod, version, SHA-256 of the .led, file in out/releases/.
+# Written by tools/build_patch.py. Versions never kept: trig 1.0.0 and 1.1.0, poly 1.0.0 and 1.1.0
+# (built before the archive existed, never flashed).
+2026-10-13  dump  1.0.0   sha256 eb4974c759d41c223ca7a58ed64c2f03ff4009ed19789ae567ed6f4409354220  bsp_2.0.1.6-dump-1.0.0.led
+2026-10-13  dump  1.0.1   sha256 87ae64bcb59c517532bd445f182f48cc90755e7ed35e4147c052d91cebd41646  bsp_2.0.1.6-dump-1.0.1.led
+2026-10-13  trig  1.2.0   sha256 dccdd3499893f86676ef022d479afde28eb9496d956c67a874878da522621aef  bsp_2.0.1.6-trig-1.2.0.led
+2026-10-13  poly  1.2.0   sha256 4cd27687ee8b0da18660c7abf14fb9ac914efa7e44c4be5a9c69548f7bededc2  bsp_2.0.1.6-poly-1.2.0.led
+2026-10-13  trig  1.2.1   sha256 f8c5ce0ab4f4adb3ac29ba5816e9c46cdd58ad1d60d96528f4a89d16e82c0095  bsp_2.0.1.6-trig-1.2.1.led
+2026-10-13  poly  1.2.1   sha256 4254f343ac8fc4d9d47c6266cdeb633e604df50b3f20b22e2c2e4839078d4c04  bsp_2.0.1.6-poly-1.2.1.led
