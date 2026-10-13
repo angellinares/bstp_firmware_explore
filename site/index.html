@@ -34,6 +34,7 @@
   #status.ok { color: var(--ok); }
   #status.bad { color: var(--accent); font-weight: 600; }
   code { font-size: .85em; word-break: break-all; }
+  a:not(.button) { color: var(--accent); }
   .warn + .warn { margin-top: 8px; }
   dialog { max-width: 460px; border: 1px solid var(--line); border-radius: 8px; padding: 20px;
            background: var(--card); color: var(--fg); }
@@ -45,7 +46,9 @@
 <body>
 <main>
   <h1>BeatStep Pro mods</h1>
-  <p class="dim">Unofficial changes to Arturia's BeatStep Pro firmware 2.0.1.6. Not made or supported by Arturia.</p>
+  <p class="dim">Unofficial changes to Arturia's BeatStep Pro firmware 2.0.1.6. Not made or supported by Arturia.
+    Source code, changelog and how it is tested:
+    <a href="https://github.com/angellinares/bstp_firmware_explore">github.com/angellinares/bstp_firmware_explore</a>.</p>
   <p class="warn">Modified firmware can leave your BeatStep Pro unusable, and you install it at your own risk.
     Before installing anything from here, install Arturia's own 2.0.1.6 file once with MIDI Control Center,
     so you know the way back works on your unit.</p>
