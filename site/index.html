@@ -100,6 +100,16 @@
     const version = Object.assign(document.createElement("span"), { className: "tag", textContent: "v" + mod.version });
     const tested = Object.assign(document.createElement("span"), { className: "tag", textContent: mod.hardware });
     const summary = Object.assign(document.createElement("p"), { textContent: mod.summary });
+    const item = (text) => Object.assign(document.createElement("li"), { textContent: text });
+    const section = (parent, title, items) => {
+      const ul = document.createElement("ul");
+      ul.append(...items.map(item));
+      parent.append(Object.assign(document.createElement("h3"), { textContent: title }), ul);
+    };
+    const guide = document.createElement("details");
+    guide.append(Object.assign(document.createElement("summary"), { textContent: "How to use it" }));
+    for (const [title, items] of mod.guide) section(guide, title, items);
+    guide.hidden = !mod.guide.length;
     const log = document.createElement("details");
     log.append(Object.assign(document.createElement("summary"), { textContent: "Changelog" }));
     const list = document.createElement("ul");
@@ -109,21 +119,15 @@
     log.append(list);
     const checks = document.createElement("details");
     checks.append(Object.assign(document.createElement("summary"), { textContent: "Tests and checks" }));
-    const item = (text) => Object.assign(document.createElement("li"), { textContent: text });
-    const section = (title, items) => {
-      const ul = document.createElement("ul");
-      ul.append(...items.map(item));
-      checks.append(Object.assign(document.createElement("h3"), { textContent: title }), ul);
-    };
-    section("On a BeatStep Pro (one unit)", mod.device.length
+    section(checks, "On a BeatStep Pro (one unit)", mod.device.length
       ? mod.device.map(([date, v, text]) => `${v} (${date}): ${text}`) : ["Nothing yet."]);
     checks.append(Object.assign(document.createElement("p"), { className: "dim", textContent: mod.unchecked }));
     const count = mod.emulator.reduce((n, [, tests]) => n + tests.length, 0);
     checks.append(Object.assign(document.createElement("p"), { textContent:
       `In an emulator: ${count} automated checks run the mod's code against the firmware image. ` +
       "They show what the code computes, not that a device behaves." }));
-    for (const [group, tests] of mod.emulator) section(group, tests);
-    label.append(radio, name, version, tested, summary, log, checks);
+    for (const [group, tests] of mod.emulator) section(checks, group, tests);
+    label.append(radio, name, version, tested, summary, guide, log, checks);
     $("mods").append(label);
     radio.addEventListener("change", reset);
   }
