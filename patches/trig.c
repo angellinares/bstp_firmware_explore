@@ -22,6 +22,14 @@
  * storage area that stock firmware never writes (see save_drum). Limit: the
  * stock step setter writes 0 or 1, so turning a step off, shifting or copying
  * steps drops their codes.
+ *
+ * Ratchets (DRUM track): a step can play 2, 4 or 8 times inside its own
+ * length. Hold a step of the selected pad and touch the roller strip: a rate
+ * finer than the track's step size sets it, the track's own rate or a coarser
+ * one clears it. Recording a roll that is finer than the track marks the
+ * steps it fills. Bit 7 of the on byte says the step has a ratchet, so the
+ * stock setter drops it with the codes; the rate is in patch RAM (RATE).
+ * A ratcheted step shows in cyan.
  */
 #include "fw.h"
 
@@ -50,7 +58,8 @@ void fw_button_flag(void *buttons, int id, int value);
 
 #define MELODIC_ON 0x8B7  /* seq + track * 0x230 + this + step */
 #define DRUM_ON    0x1FF9 /* seq + this + pad * 0x40 + step */
-#define DRUM_NOTE  0xBD9  /* seq + this + pad * 0x40 + step */
+#define DRUM_SHIFT 0xBD9  /* seq + this + pad * 0x40 + step: 50 is on the beat */
+#define DRUM_GATE  0x13D9 /* seq + this + pad * 0x40 + step, percent; 100 ties */
 #define DRUM_PAD   0xB50  /* seq + this, int: the pad the step buttons show */
 #define DRUM_SIZE  0xB48  /* seq + this, int: step size */
 #define DRUM_DIR   0xB4C  /* seq + this, int: 2 is alternate */
@@ -107,6 +116,230 @@ static u8 *step_on(struct seq *seq, int track)
     return (u8 *)seq + track * 0x230 + MELODIC_ON;
 }
 
+/* Ratchets. Patch RAM is not cleared at start-up: ready() does it once. */
+#define R_VALID  0x80                              /* in the on byte: the step has a ratchet */
+#define R_MAX    96                                /* ratchets a drum pattern can store */
+#define RATE     ((u8 *)0x20006800)                /* [pad * 64 + step]: bits 0..1 hits (1: 2, 2: 4, 3: 8); bits 2..5 velocity ramp, not used yet */
+#define R_LIST   ((u8 *)0x20006C00)                /* R_MAX * 2 bytes: the ratchets as stored */
+#define SHOW_RATCHET 0xC0                          /* shown value: this | hits code, or | 4 for "full" */
+
+/* What is left of the ratchet a pad is playing. */
+struct pend {
+    u16 time;       /* timer value of the next hit */
+    u16 gap;        /* ticks between hits */
+    u8 step, left, queued;
+};
+#define PEND ((struct pend *)0x20006640)           /* per pad */
+
+/* The step a recorded roll is filling. */
+struct rec {
+    u8 step, code, count;
+};
+#define REC ((struct rec *)0x200066C0)             /* per pad */
+
+struct misc {
+    u32 magic;
+    u8 led;         /* the step whose light is being chosen has a ratchet */
+    u8 swallow;     /* the strip touch set a ratchet: it must not start the roller */
+    u8 full;        /* the last strip touch found the pattern full */
+};
+#define MISC ((struct misc *)0x20006700)
+#define MISC_MAGIC 0x52415443
+
+#define EVENT    (*(volatile u16 *)0x20000618)     /* timer value of the event being handled */
+#define TIM4_DIER (*(volatile u16 *)0x4000080C)
+#define TIM4_SR  (*(volatile u16 *)0x40000810)
+#define TIM4_CNT (*(volatile u16 *)0x40000824)
+#define TIM4_CCR4 (*(volatile u16 *)0x40000840)
+#define CC4      0x10
+#define LOOPER   0xB35  /* seq + this: the looper is repeating steps */
+#define ROLL_ZONE 0x2444 /* seq + this, int: the strip zone, 0 or 1, 2, 4, 8 for 1/4 to 1/32 */
+#define ROLL_ON  0x244D /* seq + this: the roller is running */
+#define ROLL_PERIOD 0x6B0 /* seq + this, u16: ticks between roller hits */
+#define RECORDED_STEP ((volatile u8 *)0x200018A7)  /* per pad: the step the hit being recorded falls in */
+
+void fw_note_off_at(struct seq *seq, int step, int pad, int live);
+void fw_merge(void *events, int node);
+void fw_drum_events(struct seq *seq, u32 a, u32 b, u32 c);
+u32 fw_step_map(struct seq *seq, int track, u32 step, int pad);
+void fw_led(void *leds, int index, int colour);
+void fw_strip_set(struct seq *seq, u32 zone, int send);
+void fw_knob_show(void *buttons, int knob, int on);
+u32 fw_swing_get(struct seq *seq, int track);
+void fw_swing_set(struct seq *seq, int track, u32 value);
+u32 fw_swing_shown(struct seq *seq, int track);
+void fw_record_on(int track, u32 note, u32 velocity, int pad);
+void fw_record_off(int track, int pad, int tie);
+
+static u32 irq_off(void)
+{
+    u32 mask;
+
+    __asm__ volatile("mrs %0, primask\n" "cpsid i" : "=r"(mask));
+    return mask;
+}
+
+static void irq_restore(u32 mask)
+{
+    __asm__ volatile("msr primask, %0" : : "r"(mask));
+}
+
+static void ready(void)
+{
+    if (MISC->magic == MISC_MAGIC)
+        return;
+    for (u32 i = 0; i < PADS; i++) {
+        PEND[i].left = 0;
+        REC[i].count = 0;
+    }
+    MISC->led = MISC->swallow = MISC->full = 0;
+    MISC->magic = MISC_MAGIC;
+}
+
+/* -> the hits code of a drum step, 1..3, or 0 when it has no ratchet. */
+static u32 ratchet_of(struct seq *seq, u32 pad, u32 step)
+{
+    if (pad >= PADS || step >= STEPS || !(((u8 *)seq)[DRUM_ON + pad * 0x40 + step] & R_VALID))
+        return 0;
+    return RATE[pad * 0x40 + step] & 3;
+}
+
+/* -> 1 if the step-on event being handled is a later hit of the pad's ratchet. */
+static u32 repeating(int pad, int step)
+{
+    const struct pend *p = &PEND[pad & 15];
+
+    ready();
+    return (u32)pad < PADS && p->left && p->step == step && (u16)(EVENT - p->time) < p->gap;
+}
+
+/* Replaces the call that schedules the end of a drum step's note, the last
+ * thing the step-on path does when the step really played (0x0801E2FE). On a
+ * ratcheted step it also asks for the next hit, half, a quarter or an eighth
+ * of a step later; flush() puts that in the firmware's own queue of timed
+ * step-ons, so the hit plays through the stock path. The gate is taken of
+ * the gap between hits and capped, so that each hit ends before the next: the
+ * drum gate outputs need the gap to fire again. */
+void drum_played(struct seq *seq, int step, int pad, int live)
+{
+    u8 *s = (u8 *)seq;
+    struct pend *p = &PEND[pad & 15];
+    u32 code, gate, mask;
+    u16 period;
+
+    if (!repeating(pad, step)) {
+        code = ratchet_of(seq, pad, step);
+        /* Not while an earlier ratchet of this pad still has hits to come. */
+        if (!code || s[LOOPER] || (p->left && (s16)(EVENT - p->time) < 0)) {
+            fw_note_off_at(seq, step, pad, live);
+            return;
+        }
+        p->gap = fw_step_ticks(seq, *(const int *)(s + DRUM_SIZE), 2) >> code;
+        p->step = step;
+        p->left = 1 << code;
+    }
+    if (--p->left) {
+        p->time = EVENT + p->gap;
+        p->queued = 0;
+    }
+    gate = s[DRUM_GATE + pad * 0x40 + step];
+    if (gate > 90)
+        gate = 90;
+    /* The stock scheduler takes a live note's length from the roller period. */
+    mask = irq_off();
+    period = *(u16 *)(s + ROLL_PERIOD);
+    *(u16 *)(s + ROLL_PERIOD) = 2 * (p->gap * gate / 100 + 1);
+    fw_note_off_at(seq, step, pad, 1);
+    *(u16 *)(s + ROLL_PERIOD) = period;
+    irq_restore(mask);
+}
+
+struct event {
+    u32 time;       /* 16-bit timer value; all ones in an empty entry */
+    s8 pad, step;   /* the step before the direction mapping */
+    u8 unused[2];
+};
+#define QUEUE(seq) ((struct event *)((u8 *)(seq) + 8))
+#define QUEUE_SIZE 32
+
+/* Put the hits asked for into the step-on queue -> 1 if there were any. The
+ * handler plays the entries that are due from the front and drops what it
+ * finds overdue, so the queue is kept in time order. */
+static u32 flush(struct seq *seq)
+{
+    struct event *queue = QUEUE(seq);
+    u32 n = 0, added = 0, mask;
+    u16 now;
+
+    ready();
+    mask = irq_off();
+    while (n < QUEUE_SIZE && queue[n].time != 0xFFFFFFFF)
+        n++;
+    for (u32 pad = 0; pad < PADS; pad++) {
+        struct pend *p = &PEND[pad];
+
+        if (!p->left || p->queued)
+            continue;
+        if (n >= QUEUE_SIZE - 1) {
+            p->left = 0;                           /* queue full: the hit is skipped */
+            continue;
+        }
+        queue[n].time = p->time;
+        queue[n].pad = pad;
+        queue[n].step = fw_step_map(seq, 2, p->step, pad);
+        n++;
+        p->queued = added = 1;
+    }
+    if (added) {
+        queue[n].time = 0xFFFFFFFF;
+        queue[n].pad = 0x10;
+        queue[n].step = -1;
+        /* Soonest first; an entry up to 0x200 ticks overdue still counts as soonest. */
+        now = TIM4_CNT - 0x200;
+        for (u32 i = 1; i < n; i++) {
+            struct event e = queue[i];
+            u32 j = i;
+
+            for (; j && (u16)(queue[j - 1].time - now) > (u16)(e.time - now); j--)
+                queue[j] = queue[j - 1];
+            queue[j] = e;
+        }
+    }
+    irq_restore(mask);
+    return added;
+}
+
+/* Replaces the call that appends a step boundary's timed step-ons to the
+ * queue (0x0801691A); the stock code then sets the timer for the first entry. */
+void drum_merge(void *events, int node)
+{
+    fw_merge(events, node);
+    flush(SEQ);
+}
+
+/* Replaces the timer handler that plays the queued step-ons (0x0800692C).
+ * It has set the timer for what was left; the hits asked for while it ran
+ * may come sooner. */
+void drum_events(struct seq *seq, u32 a, u32 b, u32 c)
+{
+    struct event *queue = QUEUE(seq);
+    u16 at, now;
+
+    fw_drum_events(seq, a, b, c);
+    if (!flush(seq))
+        return;
+    at = queue[0].time;
+    now = TIM4_CNT;
+    if ((u16)(at - now - 3) >= 0x8000) {           /* too close to catch: as stock does, three ticks from now */
+        for (u32 i = 0; i < QUEUE_SIZE && queue[i].time == at; i++)
+            queue[i].time = (u16)(now + 3);
+        at = now + 3;
+    }
+    TIM4_SR = (u16)~CC4;
+    TIM4_CCR4 = at;
+    TIM4_DIER |= CC4;
+}
+
 /* -> how many times a drum pad has played its pattern through, for the step
  * about to play. A drum pad's position is not stored and stepped: the
  * firmware works it out from the track's tick count, so the pass is worked
@@ -142,6 +375,9 @@ u32 trig_step_on(struct seq *seq, int track, int step, int pad)
     u32 code = on >> 1 & 0x3f;
     u32 k = cond_of(on);
 
+    /* The later hits of a ratchet: the step was decided at its first. */
+    if (track == 2 && on && repeating(pad, step))
+        return on;
     if (k && (u32)track < 2) {
         u32 pass = PASS[track];
 
@@ -178,15 +414,20 @@ static u8 *held(struct seq *seq)
     return step_on(seq, track) + HELD_STEP[track];
 }
 
-static void set_code(struct seq *seq, u8 *on, u32 code)
+/* The held step was changed: the pattern needs saving, and letting go of the
+ * step must leave it on, as after the stock hold-a-step-and-press-a-pad. */
+static void touched(struct seq *seq)
 {
-    *on = 1 | code << 1;
     ((u8 *)seq)[DIRTY + CUR_TRACK] = 1;
-    /* As the stock hold-a-step-and-press-a-pad gesture does, so that
-     * letting go of the step leaves it on. */
     HOLD_USED[CUR_TRACK] = 1;
     if (HELD_PAD[CUR_TRACK] >= 0)
         fw_button_flag(BUTTONS, HELD_PAD[CUR_TRACK] + STEP_BUTTON, 0);
+}
+
+static void set_code(struct seq *seq, u8 *on, u32 code)
+{
+    *on = (*on & R_VALID) | 1 | code << 1;
+    touched(seq);
 }
 
 static u32 percent(u32 on)
@@ -261,11 +502,172 @@ void ui_cond_set(struct seq *seq, int track, u32 value)
     set_code(seq, on, value ? CODES + value : 0);
 }
 
+
+/* -> the on byte of the drum step held, if it is on, else 0. */
+static u8 *drum_held(struct seq *seq)
+{
+    u8 *on = CUR_TRACK == 2 ? held(seq) : 0;
+
+    return on && *on ? on : 0;
+}
+
+static u32 ratchets(struct seq *seq)
+{
+    u32 count = 0;
+
+    for (u32 i = 0; i < PADS * 0x40; i++)
+        count += ((u8 *)seq)[DRUM_ON + i] >> 7;
+    return count;
+}
+
+/* Give a drum step that is on a ratchet, or with code 0 take it away -> 0 if
+ * the pattern has no room for another. */
+static u32 set_ratchet(struct seq *seq, u32 pad, u32 step, u32 code)
+{
+    u8 *on = (u8 *)seq + DRUM_ON + pad * 0x40 + step;
+
+    if (!code) {
+        *on &= ~R_VALID;
+    } else {
+        if (!(*on & R_VALID) && ratchets(seq) >= R_MAX)
+            return 0;
+        RATE[pad * 0x40 + step] = code;
+        *on |= R_VALID;
+    }
+    ((u8 *)seq)[DIRTY + 2] = 1;
+    return 1;
+}
+
+/* -> the hits code for a strip zone on this track: how many times finer than
+ * the step size it is, as a power of two; 0 when it is not finer. */
+static u32 zone_code(struct seq *seq, u32 zone)
+{
+    u32 size = *(const u32 *)((u8 *)seq + DRUM_SIZE) & 3, code = 0;
+
+    for (zone >>= size; zone > 1 && code < 3; zone >>= 1)
+        code++;
+    return code;
+}
+
+/* Replaces the setter the touch strip reader calls with the zone it found
+ * (0x08007CC0 and four more). With a drum step held the touch sets that
+ * step's ratchet and is kept from the roller and the looper until the finger
+ * is lifted. */
+void strip_set(struct seq *seq, u32 zone, int send)
+{
+    ready();
+    if (!zone)
+        MISC->swallow = 0;
+    else if (drum_held(seq)) {
+        u32 pad = *(u32 *)((u8 *)seq + DRUM_PAD);
+
+        MISC->full = !set_ratchet(seq, pad, HELD_STEP[2], zone_code(seq, zone));
+        MISC->swallow = 1;
+        REC[pad].count = 0;
+        touched(seq);
+        fw_knob_show(BUTTONS, 0x11, 1);            /* the Swing knob's value: ui_swing_shown */
+    }
+    fw_strip_set(seq, MISC->swallow ? 0 : zone, send);
+}
+
+/* Replace the Swing knob's getter (0x0802C0D2, 0x0802C372) and setter
+ * (0x0802C108, 0x0802C3A2). With a drum step held the knob leaves the swing
+ * alone and the display shows the step's ratchet. The handler only calls the
+ * setter inside 50..75, so the getter answers from the middle. */
+u32 ui_swing_get(struct seq *seq, int track)
+{
+    return drum_held(seq) ? 60 : fw_swing_get(seq, track);
+}
+
+void ui_swing_set(struct seq *seq, int track, u32 value)
+{
+    if (drum_held(seq)) {
+        MISC->full = 0;
+        HOLD_USED[2] = 1;
+        if (HELD_PAD[2] >= 0)
+            fw_button_flag(BUTTONS, HELD_PAD[2] + STEP_BUTTON, 0);
+    } else {
+        fw_swing_set(seq, track, value);
+    }
+}
+
+/* Replaces the read of the swing for the display (0x080099F8); show_value
+ * turns the answer into r 1, r 2, r 4, r 8 or FuL. */
+u32 ui_swing_shown(struct seq *seq, int track)
+{
+    if (!drum_held(seq))
+        return fw_swing_shown(seq, track);
+    ready();
+    return SHOW_RATCHET | (MISC->full ? 4 : ratchet_of(seq, *(u32 *)((u8 *)seq + DRUM_PAD), HELD_STEP[2]));
+}
+
+/* Replace, where the step buttons are lit, the read of each step (0x08008A1A,
+ * 0x08008B5A) and the call that gives an on step the track's colour (four
+ * sites): a ratcheted step is cyan. The play cursor is painted after. */
+u32 led_step_on(struct seq *seq, int track, int step, int pad)
+{
+    MISC->led = track == 2 && ratchet_of(seq, pad, step);
+    return fw_step_on(seq, track, step, pad);
+}
+
+void led_colour(void *leds, int index, int colour)
+{
+    if (MISC->led)
+        colour = 4;
+    MISC->led = 0;
+    fw_led(leds, index, colour);
+}
+
+/* Replaces the calls that note a played pad for recording (ten sites).
+ * While the roller runs finer than the track, count the hits that fall in
+ * the same step. */
+void rec_on(int track, u32 note, u32 velocity, int pad)
+{
+    struct seq *seq = SEQ;
+    const u8 *s = (const u8 *)seq;
+    struct rec *r = &REC[pad & 15];
+    u32 code;
+
+    fw_record_on(track, note, velocity, pad);
+    if (track != 2 || (u32)pad >= PADS)
+        return;
+    ready();
+    code = s[ROLL_ON] ? zone_code(seq, *(const u32 *)(s + ROLL_ZONE)) : 0;
+    if (code && r->count && r->step == RECORDED_STEP[pad] && r->code == code) {
+        if (r->count < 2)
+            r->count++;
+    } else {
+        r->step = RECORDED_STEP[pad];
+        r->code = code;
+        r->count = code != 0;
+    }
+}
+
+/* Replaces the call that writes a recorded hit into its step (seven sites).
+ * The write leaves the step plainly on; a step that got two hits of a finer
+ * roll is given the roll's rate after it. */
+void rec_off(int track, int pad, int tie)
+{
+    const struct rec *r = &REC[pad & 15];
+
+    fw_record_off(track, pad, tie);
+    if (track != 2 || (u32)pad >= PADS)
+        return;
+    ready();
+    if (r->count >= 2 && r->step < STEPS && ((u8 *)SEQ)[DRUM_ON + pad * 0x40 + r->step])
+        set_ratchet(SEQ, pad, r->step, r->code);
+}
+
 /* Display glyphs: 0..9 are the digits. */
 #define G_DASH 0x20
 #define G_N    0x25
 #define G_S    0x1C
 #define G_T    0x1B
+#define G_R    0x1E
+#define G_L    0x1D
+#define G_U    0x28
+#define G_F    0x0F
+#define G_NONE 0x2C
 
 /* Replaces the number display where knob_display_value shows a knob's value
  * (0x08009C96, 0x08009CCC, 0x08009D9E, 0x08009E02). */
@@ -273,7 +675,11 @@ void show_value(void *display, int field, int value)
 {
     u32 k = value & 0x7f;
 
-    if (value >= 0 || k > CONDS) {
+    if (value == (s8)(SHOW_RATCHET | 4)) {
+        fw_show_glyphs(display, field, G_F, G_U, G_L);
+    } else if (value >= (s8)SHOW_RATCHET && value < (s8)(SHOW_RATCHET | 4)) {
+        fw_show_glyphs(display, field, G_R, G_NONE, 1 << (value & 3));
+    } else if (value >= 0 || k > CONDS) {
         fw_show_number(display, field, value);
     } else if (k == 0) {
         fw_show_glyphs(display, field, 1, G_DASH, 1);
@@ -308,6 +714,8 @@ void pos_reset(struct seq *seq, int track, u32 position, int pad)
 {
     if ((u32)track < 2)
         PASS[track] = 0;
+    for (u32 i = 0; i < PADS; i++)
+        PEND[i].left = 0;
     fw_pos_set(seq, track, position, pad);
 }
 
@@ -373,8 +781,11 @@ void load_codes(struct seq *seq, int track, void **caller_sp)
  * a time, so that the stock loader's piecewise loads can each be followed:
  *
  *   0xC10  0xD7 if codes are stored; then for q 0..3 a 16-bit hash of the
- *          page's notes and on bits, then for q 0..3 a check byte of its codes
+ *          page's shifts and on bits, then for q 0..3 a check byte of its
+ *          codes, then how many ratchets are stored and their check byte
  *   0xC40  codes of page 0        0xD00, 0xE00, 0xF00  codes of pages 1, 2, 3
+ *   0xDC0, 0xEC0, 0xFC0  the ratchets, 32 to a block: step | hits code << 6,
+ *          then pad | velocity ramp << 4
  *
  * The hash ties the codes to the steps they were saved with: a pattern that
  * was since written by stock firmware or MIDI Control Center loads without
@@ -384,7 +795,10 @@ void load_codes(struct seq *seq, int track, void **caller_sp)
 #define D_HEAD_SIZE 0x30
 #define D_MAGIC   0xD7
 #define D_CODES   (PADS * 16 * 6 / 8)             /* 192 */
-#define D_BUF     ((u8 *)0x20006500)              /* patch RAM, D_HEAD_SIZE + D_CODES bytes */
+#define D_TAIL    0x40                            /* a block of ratchets behind a page's codes */
+#define D_BUF     ((u8 *)0x20006500)              /* patch RAM, D_HEAD_SIZE + D_CODES + D_TAIL bytes */
+#define H_COUNT   13                              /* in the head: ratchets stored */
+#define H_RCHECK  14
 #define BUSY      (*(volatile u8 *)0x2000016D)    /* set when something else used the storage buffers */
 #define LAST_ADDR ((const u8 *)0x20000752 + 1)    /* address of the last storage transfer, high byte first */
 
@@ -400,7 +814,7 @@ static u32 page_hash(struct seq *seq, u32 q)
     for (u32 pad = 0; pad < PADS; pad++)
         for (u32 i = 0; i < 16; i++) {
             u32 step = q * 16 + i;
-            u32 note = ((u8 *)seq)[DRUM_NOTE + pad * 0x40 + step] & 0x7f;
+            u32 note = ((u8 *)seq)[DRUM_SHIFT + pad * 0x40 + step] & 0x7f;
 
             hash = (hash * 31 + (note | (*drum_on(seq, pad, step) ? 0x80 : 0))) & 0xffff;
         }
@@ -426,6 +840,58 @@ static u32 pack_page(struct seq *seq, u32 q, u8 *out)
     return any != 0;
 }
 
+
+/* Write the pattern's ratchets to R_LIST -> how many. */
+static u32 list_ratchets(struct seq *seq)
+{
+    u32 count = 0;
+
+    for (u32 i = 0; i < R_MAX * 2; i++)
+        R_LIST[i] = 0;
+    for (u32 pad = 0; pad < PADS; pad++)
+        for (u32 step = 0; step < STEPS; step++) {
+            u32 code = ratchet_of(seq, pad, step);
+
+            if (!code || count >= R_MAX)
+                continue;
+            R_LIST[count * 2] = step | code << 6;
+            R_LIST[count * 2 + 1] = pad | (RATE[pad * 0x40 + step] >> 2 & 15) << 4;
+            count++;
+        }
+    return count;
+}
+
+static u8 list_check(const u8 *list)
+{
+    u8 sum = 0xA5;
+
+    for (u32 i = 0; i < R_MAX * 2; i++)
+        sum ^= list[i];
+    return sum;
+}
+
+/* Give the steps of the pages that loaded well (bits of good) their stored
+ * ratchets. The stock loader has left those steps plainly on. */
+static void load_ratchets(struct seq *seq, const u8 *head, u32 good)
+{
+    u8 *list = R_LIST;
+    u32 count = head[H_COUNT];
+
+    for (u32 i = 0; i < R_MAX * 2; i++)
+        list[i] = LOADED[(1 + i / D_TAIL) * 0x100 + D_CODES + i % D_TAIL];
+    if (count > R_MAX || head[H_RCHECK] != list_check(list))
+        return;
+    for (u32 i = 0; i < count; i++) {
+        u32 step = list[i * 2] & 0x3f, code = list[i * 2] >> 6, pad = list[i * 2 + 1] & 15;
+        u8 *on = drum_on(seq, pad, step);
+
+        if (code && (good >> (step >> 4) & 1) && *on && !(*on & R_VALID)) {
+            RATE[pad * 0x40 + step] = code | (list[i * 2 + 1] >> 4) << 2;
+            *on |= R_VALID;
+        }
+    }
+}
+
 static u8 drum_check(const u8 *codes)
 {
     u8 sum = 0x5A;
@@ -441,14 +907,16 @@ u32 save_drum(void *storage, u32 address, u8 *data, u32 length)
 {
     struct seq *seq = SEQ;
     u8 *head = D_BUF, *codes = D_BUF + D_HEAD_SIZE;
-    u32 any = 0;
+    u32 any = 0, count = list_ratchets(seq);
 
     for (u32 i = 0; i < D_HEAD_SIZE; i++)
         head[i] = 0;
     for (u32 q = 0; q < 4; q++)
         any |= pack_page(seq, q, codes);
-    if (any) {
+    if (any | count) {
         head[0] = D_MAGIC;
+        head[H_COUNT] = count;
+        head[H_RCHECK] = list_check(R_LIST);
         for (u32 q = 4; q-- > 0;) {
             u32 hash = page_hash(seq, q);
 
@@ -456,8 +924,11 @@ u32 save_drum(void *storage, u32 address, u8 *data, u32 length)
             head[1 + q * 2] = hash;
             head[2 + q * 2] = hash >> 8;
             head[9 + q] = drum_check(codes);
-            if (q)
-                fw_storage_write(storage, address + q * 0x100, codes, D_CODES);
+            if (q) {
+                for (u32 i = 0; i < D_TAIL; i++)
+                    codes[D_CODES + i] = R_LIST[(q - 1) * D_TAIL + i];
+                fw_storage_write(storage, address + q * 0x100, codes, D_CODES + D_TAIL);
+            }
         }
         /* Page 0 is still in codes, right behind the head. */
         fw_storage_write(storage, address + D_HEAD, head, D_HEAD_SIZE + D_CODES);
@@ -475,7 +946,9 @@ void load_drum_codes(struct seq *seq, void **caller_sp)
     u32 address = LAST_ADDR[0] << 16 | LAST_ADDR[1] << 8 | LAST_ADDR[2];
     u32 in_project = address % 0x13000;
     const u8 *head = LOADED + D_HEAD;
+    u32 good;
 
+    ready();
     if (in_project < 0x2000 || in_project >= 0x12000)
         return;                                   /* the last read was not of a drum pattern */
     address = (address & ~0xFFFu) + 0xC00;
@@ -484,11 +957,13 @@ void load_drum_codes(struct seq *seq, void **caller_sp)
         fw_storage_read(storage, address, 0x400);
         if (head[0] != D_MAGIC)
             continue;
+        good = 0;
         for (u32 q = 0; q < 4; q++) {
             const u8 *in = q ? LOADED + q * 0x100 : head + D_HEAD_SIZE;
 
             if (head[9 + q] != drum_check(in) || (u32)(head[1 + q * 2] | head[2 + q * 2] << 8) != page_hash(seq, q))
                 continue;
+            good |= 1u << q;
             for (u32 pad = 0; pad < PADS; pad++)
                 for (u32 i = 0; i < 16; i += 4, in += 3) {
                     u32 codes[4] = {in[0] & 0x3f, (in[0] >> 6 | in[1] << 2) & 0x3f,
@@ -502,6 +977,7 @@ void load_drum_codes(struct seq *seq, void **caller_sp)
                     }
                 }
         }
+        load_ratchets(seq, head, good);
     } while (BUSY);
     BUSY = 1;
 }
@@ -532,8 +1008,8 @@ u32 copy_drum(void *storage, u32 address, u8 *data, u32 length)
     stored = LOADED[0] == D_MAGIC;
     fw_storage_write(storage, address + D_HEAD, (u8 *)LOADED, stored ? D_HEAD_SIZE + D_CODES : D_HEAD_SIZE);
     for (u32 q = 1; stored && q < 4; q++) {
-        fw_storage_read(storage, from + q * 0x100, D_CODES);
-        fw_storage_write(storage, address + q * 0x100, (u8 *)LOADED, D_CODES);
+        fw_storage_read(storage, from + q * 0x100, D_CODES + D_TAIL);
+        fw_storage_write(storage, address + q * 0x100, (u8 *)LOADED, D_CODES + D_TAIL);
     }
     return fw_storage_write(storage, address, keep, length);
 }

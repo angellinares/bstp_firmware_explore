@@ -36,6 +36,18 @@ fw_midi_usb          = 0x0802a785;  /* (out, message, 0) -> 1, or 0 when its 64-
 fw_midi_din          = 0x0802a79d;  /* (out, message): the 5-pin output, USART1 */
 fw_transpose_get     = 0x0801296d;  /* (seq, track) */
 fw_note_fit          = 0x080144c9;  /* (seq, note, transpose, 0) -> MIDI note */
+fw_note_off_at       = 0x080136a9;  /* (seq, step, pad, live): schedule a drum note's end from its gate */
+fw_merge             = 0x08027dbd;  /* (sorted events, 0): append them to the drum step-on queue */
+fw_drum_events       = 0x08012729;  /* (seq): the TIM4 CC4 handler, plays the queued drum steps that are due */
+fw_step_map          = 0x08013ca3;  /* (seq, track, step, pad) -> the step as played, by direction; its own inverse */
+fw_led               = 0x0801af31;  /* (leds, step button 0..15, colour) */
+fw_strip_set         = 0x080125c1;  /* (seq, zone 0/1/2/4/8, send cc): what the touch strip reads */
+fw_knob_show         = 0x0801fac5;  /* (buttons, knob id, 1): put that knob's value on the display */
+fw_swing_get         = 0x080159bb;  /* (seq, track or -1) -> 50..75 */
+fw_swing_set         = 0x08015b4b;  /* (seq, track or -1, value) */
+fw_swing_shown       = 0x08012655;  /* (seq, track or -1) -> the swing in effect */
+fw_record_on         = 0x0802d2f1;  /* (track, note, velocity, pad) */
+fw_record_off        = 0x0802d48d;  /* (track, pad, tie): writes the recorded step */
 fw_storage_read      = 0x08022a51;  /* (storage, address, length); data lands at 0x20000B5A */
 
 /* MEMORY { PATCH } comes from tools/build_patch.py: the block depends on the feature. */

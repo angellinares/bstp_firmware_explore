@@ -62,7 +62,8 @@ def test_the_page_script_rebuilds_the_tested_files():
     for name, mod in mods().items():
         if not mod["page"]:
             continue
-        with open(gen_site.BUILT % name) as f:
+        version, path = gen_site.offered(name, mod)
+        with open(path) as f:
             assert out[name]["text"] == f.read()
-        assert out[name]["stamp"] == "bstp-fw %s %s" % (name, mod["changes"][0][0])
+        assert out[name]["stamp"] == "bstp-fw %s %s" % (name, version)
         assert "already patched (bstp-fw %s" % name in out[name]["again"]

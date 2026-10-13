@@ -225,7 +225,7 @@ def test_codes_come_back_after_a_save_and_a_load(fw):
     data = 0x2000A800
     fw.write(data, bytes(range(16)))
     assert fw.call(SYM["save_drum"], STORAGE, AREA + 0xC00, data, 0x10) == 1
-    assert chip.writes == [(AREA + 0xF00, 0xC0), (AREA + 0xE00, 0xC0), (AREA + 0xD00, 0xC0),
+    assert chip.writes == [(AREA + 0xF00, 0x100), (AREA + 0xE00, 0x100), (AREA + 0xD00, 0x100),
                            (AREA + 0xC10, 0xF0), (AREA + 0xC00, 0x10)]
     assert bytes(chip.data[AREA + 0xC00 + i] for i in range(16)) == bytes(range(16)), "the stock write still happens"
     reload(fw, chip)

@@ -56,7 +56,24 @@ TRIG = [
     (0x0800D51A, 0x08022B38, "save_drum"),
     (0x0800E8DA, 0x08014228, "load_drum"),
     (0x0800D984, 0x08022B38, "copy_drum"),
-]
+    # ratchets
+    (0x0801E2FE, 0x080136A8, "drum_played"),
+    (0x0801691A, 0x08027DBC, "drum_merge"),
+    (0x0800692C, 0x08012728, "drum_events"),
+    (0x08008A1A, 0x080113DE, "led_step_on"),
+    (0x08008B5A, 0x080113DE, "led_step_on"),
+    (0x0802C0D2, 0x080159BA, "ui_swing_get"),
+    (0x0802C372, 0x080159BA, "ui_swing_get"),
+    (0x0802C108, 0x08015B4A, "ui_swing_set"),
+    (0x0802C3A2, 0x08015B4A, "ui_swing_set"),
+    (0x080099F8, 0x08012654, "ui_swing_shown"),
+] + [(site, 0x0801AF30, "led_colour") for site in (0x08008A48, 0x08008B3C, 0x08008B8C, 0x08008CDA)
+] + [(site, 0x080125C0, "strip_set") for site in (0x08007CC0, 0x08007CF0, 0x08007D22, 0x08007D52, 0x08007D6E)
+] + [(site, 0x0802D2F0, "rec_on") for site in (
+    0x08010230, 0x08016490, 0x0801BBBE, 0x0801CAE0, 0x0801CC46, 0x0802699E, 0x080269FC, 0x08026AEC, 0x08026B4A,
+    0x08026D70)
+] + [(site, 0x0802D48C, "rec_off") for site in (
+    0x080109F2, 0x0801C9A0, 0x08026A1E, 0x08026B6C, 0x08026D9E, 0x0802D352, 0x0802D3D0)]
 POLY = (
     [(site, 0x0801D488, "poly_note_on") for site in (
         0x0801DDE8, 0x0801DE3E, 0x0801DE6E, 0x0801DF24, 0x0801DF4C, 0x0801DF8C,
@@ -76,8 +93,9 @@ POLY = (
 )
 # feature -> (sources, compiler defines, redirects, first address of its code)
 # dump fits the image's last block, which the stock update already sends as
-# data. trig (since 1.2.1) and poly need the block below as well, which the
-# stock update only erases: their .led carries one more data frame than Arturia's.
+# data. trig and poly need blocks below it as well (trig one since 1.2.1 and two
+# since 1.3.0, poly three), which the stock update only erases: their .led
+# carries that many more data frames than Arturia's.
 DUMP = [
     (0x0800C196, 0x0802BEE4, "dump_poll"),
     (0x0802C20C, 0x08011C48, "dump_start"),
@@ -86,8 +104,8 @@ DUMP = [
 
 FEATURES = {
     "dump": (["dump.c"], [], DUMP, 0x0803A800),
-    "trig": (["trig.c"], [], TRIG, 0x0803A000),
-    "poly": (["trig.c", "poly.c"], ["-DPOLY"], TRIG + POLY, 0x0803A000),
+    "trig": (["trig.c"], [], TRIG, 0x08039800),
+    "poly": (["trig.c", "poly.c"], ["-DPOLY"], TRIG + POLY, 0x08039000),
 }
 
 
@@ -97,9 +115,9 @@ def mods():
         return json.load(f)
 
 
-def stamp(feature):
-    """-> the STAMP bytes for a mod: b"bstp-fw trig 1.0.0", zero-padded."""
-    text = STAMP_MARK + ("%s %s" % (feature, mods()[feature]["changes"][0][0])).encode("ascii")
+def stamp(feature, version=None):
+    """-> the STAMP bytes for a mod: b"bstp-fw trig 1.0.0", zero-padded. The newest version unless one is given."""
+    text = STAMP_MARK + ("%s %s" % (feature, version or mods()[feature]["changes"][0][0])).encode("ascii")
     if len(text) >= STAMP:
         raise ValueError("stamp %r does not fit %d bytes" % (text, STAMP))
     return text.ljust(STAMP, b"\0")
@@ -231,7 +249,8 @@ def main():
         f.write(image)
     subprocess.run([sys.executable, os.path.join(REPO, "tools", "led.py"), "pack",
                     stem + ".bin", led_path, stem + ".led"], check=True)
-    archive(stem, feature)
+    if "--dev" not in sys.argv:  # a build that is not a release yet is not kept
+        archive(stem, feature)
 
 
 if __name__ == "__main__":
