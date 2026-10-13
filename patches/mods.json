@@ -2,7 +2,16 @@
  "trig": {
   "name": "Step chance and conditions",
   "page": true,
-  "hardware": "1.2.0 tested on a device, 2026-10-13",
+  "hardware": "1.2.1 runs on one device, 2026-10-13",
+  "tests": [["Chance", "test_trig.py"], ["Conditions", "test_cond.py"], ["Drum steps", "test_drum.py"]],
+  "device": [
+   ["2026-10-13", "1.2.0", "MIDI Control Center accepted the update file; the unit restarted by itself and played existing patterns as before."],
+   ["2026-10-13", "1.2.0", "Chance (Randomness) and conditions (Probability) on SEQ1 and SEQ2 worked, and survived a save and a power cycle."],
+   ["2026-10-13", "1.2.0", "The inverted form reads clearly on the display as n12."],
+   ["2026-10-13", "1.2.1", "The update file, which has one more data frame than Arturia's, was accepted; the unit runs and the mod works."],
+   ["2026-10-13", "1.2.1", "Copying a pattern works."]
+  ],
+  "unchecked": "Not yet reported from a device: swing, drum shift, reverse and alternate direction, changing pattern while playing, copy project, and long use.",
   "summary": "Each SEQ1, SEQ2 and DRUM step can have a chance to play (hold the step, turn Randomness) or a condition such as every second pass (hold the step, turn Probability).",
   "changes": [
    ["1.2.1", "2026-10-13", "Chance and conditions on DRUM steps too, set on the selected pad's steps and saved with the drum pattern. Each pad counts the passes of its own length. Copy project carries them."],
@@ -14,6 +23,9 @@
  "poly": {
   "name": "Chords (with step chance and conditions)",
   "page": false,
+  "tests": [["Chords", "test_poly.py"]],
+  "device": [],
+  "unchecked": "Nothing has been checked on a device.",
   "hardware": "not run on a device yet",
   "summary": "Up to four notes on a SEQ1 or SEQ2 step. Includes step chance and conditions. Chords are saved in a part of the storage chip the stock firmware does not use.",
   "changes": [

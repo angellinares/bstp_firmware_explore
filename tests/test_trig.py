@@ -117,7 +117,7 @@ def test_knob_is_stock_when_no_step_is_held(fw, track):
 
 
 @pytest.mark.parametrize("cur", [2, 3])
-def test_knob_is_stock_off_the_melodic_tracks(fw, cur):
+def test_knob_is_stock_in_control_mode_and_on_a_drum_step_that_is_off(fw, cur):
     fw.write(CUR_TRACK, struct.pack("<i", cur))
     fw.write(HELD_STEP, [4, 4, 4])
     fw.call(SYM["ui_chance_set"], SEQ, -1, 12)

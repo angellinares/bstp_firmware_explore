@@ -8,7 +8,7 @@ const PATCHES = {
    "id": "trig",
    "name": "Step chance and conditions",
    "version": "1.2.1",
-   "hardware": "1.2.0 tested on a device, 2026-10-13",
+   "hardware": "1.2.1 runs on one device, 2026-10-13",
    "summary": "Each SEQ1, SEQ2 and DRUM step can have a chance to play (hold the step, turn Randomness) or a condition such as every second pass (hold the step, turn Probability).",
    "changes": [
     [
@@ -30,6 +30,96 @@ const PATCHES = {
      "1.0.0",
      "2026-10-13",
      "First version: per-step trigger chance, saved with the pattern."
+    ]
+   ],
+   "device": [
+    [
+     "2026-10-13",
+     "1.2.0",
+     "MIDI Control Center accepted the update file; the unit restarted by itself and played existing patterns as before."
+    ],
+    [
+     "2026-10-13",
+     "1.2.0",
+     "Chance (Randomness) and conditions (Probability) on SEQ1 and SEQ2 worked, and survived a save and a power cycle."
+    ],
+    [
+     "2026-10-13",
+     "1.2.0",
+     "The inverted form reads clearly on the display as n12."
+    ],
+    [
+     "2026-10-13",
+     "1.2.1",
+     "The update file, which has one more data frame than Arturia's, was accepted; the unit runs and the mod works."
+    ],
+    [
+     "2026-10-13",
+     "1.2.1",
+     "Copying a pattern works."
+    ]
+   ],
+   "unchecked": "Not yet reported from a device: swing, drum shift, reverse and alternate direction, changing pattern while playing, copy project, and long use.",
+   "emulator": [
+    [
+     "Chance",
+     [
+      "Steps without a code play as stock",
+      "Chance matches the table",
+      "Unknown codes always play",
+      "One draw per step from the stock generator",
+      "Knob is stock when no step is held",
+      "Knob is stock in control mode and on a drum step that is off",
+      "Knob is stock when the held step is off",
+      "Turning the knob walks the table",
+      "Setting a chance leaves the track alone and marks it",
+      "Setting a chance cancels the toggle like the pad gesture",
+      "Codes survive save and load",
+      "Records without valid codes load as stock",
+      "Only the patch area and the call sites changed"
+     ]
+    ],
+    [
+     "Conditions",
+     [
+      "A condition plays on its passes only",
+      "Tracks count their own passes",
+      "In alternate direction a pass is there and back",
+      "A pass is counted when the position wraps",
+      "A one step loop counts every step",
+      "Play stop and pattern change start the count again",
+      "The drum track leaves the counters alone",
+      "Probability is stock when no step is held",
+      "The knob walks the conditions and stops at both ends",
+      "A step has a chance or a condition",
+      "A held step that is off gets no condition",
+      "The display shows the condition",
+      "Other values go to the stock number display",
+      "The knob order is the agreed one"
+     ]
+    ],
+    [
+     "Drum steps",
+     [
+      "The knobs set the held step of the selected pad",
+      "A drum step that is off leaves the knobs stock",
+      "A drum chance draws",
+      "A drum condition follows the passes of its own pad",
+      "A step played early or late belongs to its own pass",
+      "Backwards and alternate",
+      "A looped range counts its own passes",
+      "Melodic passes are not touched by the drum track",
+      "Codes come back after a save and a load",
+      "A pattern without codes costs one small write",
+      "A chip that was never written gives no codes",
+      "A page changed since the save loses its codes and only that page",
+      "A damaged page loses its codes",
+      "Steps the loader did not touch keep what they have",
+      "Nothing is read when the last read was not a drum pattern",
+      "The load hook finds the storage object and keeps the arguments",
+      "Copy project takes the codes along",
+      "Copy project of a pattern without codes clears the old ones"
+     ]
     ]
    ],
    "sha256": "864231ef0a38db673b59549940affac0fadb2db13e4bdbb7f71381ac4506a93d",

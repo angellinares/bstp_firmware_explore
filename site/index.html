@@ -36,6 +36,7 @@
   code { font-size: .85em; word-break: break-all; }
   a:not(.button) { color: var(--accent); }
   .warn + .warn { margin-top: 8px; }
+  details h3 { font-size: .95rem; margin: 12px 0 2px; }
   dialog { max-width: 460px; border: 1px solid var(--line); border-radius: 8px; padding: 20px;
            background: var(--card); color: var(--fg); }
   dialog::backdrop { background: rgba(0, 0, 0, .55); }
@@ -106,7 +107,23 @@
       list.append(Object.assign(document.createElement("li"), { textContent: `${v} (${date}): ${text}` }));
     }
     log.append(list);
-    label.append(radio, name, version, tested, summary, log);
+    const checks = document.createElement("details");
+    checks.append(Object.assign(document.createElement("summary"), { textContent: "Tests and checks" }));
+    const item = (text) => Object.assign(document.createElement("li"), { textContent: text });
+    const section = (title, items) => {
+      const ul = document.createElement("ul");
+      ul.append(...items.map(item));
+      checks.append(Object.assign(document.createElement("h3"), { textContent: title }), ul);
+    };
+    section("On a BeatStep Pro (one unit)", mod.device.length
+      ? mod.device.map(([date, v, text]) => `${v} (${date}): ${text}`) : ["Nothing yet."]);
+    checks.append(Object.assign(document.createElement("p"), { className: "dim", textContent: mod.unchecked }));
+    const count = mod.emulator.reduce((n, [, tests]) => n + tests.length, 0);
+    checks.append(Object.assign(document.createElement("p"), { textContent:
+      `In an emulator: ${count} automated checks run the mod's code against the firmware image. ` +
+      "They show what the code computes, not that a device behaves." }));
+    for (const [group, tests] of mod.emulator) section(group, tests);
+    label.append(radio, name, version, tested, summary, log, checks);
     $("mods").append(label);
     radio.addEventListener("change", reset);
   }
