@@ -19,7 +19,7 @@ build tested here. You install it with MIDI Control Center, like any update.
 | Mod | What it does | Status |
 |---|---|---|
 | Step chance and conditions | Hold a step and turn **Randomness** to give it a chance to play, or **Probability** to give it a condition: `1-2` plays on pass 1 of every 2, `n12` on every pass but that one, `1St` on the first pass only, up to `4-4`. On SEQ1, SEQ2 and, since 1.2.1, on DRUM steps of the selected pad. Saved with the pattern. | Runs on one unit |
-| Chords | Up to four notes on a SEQ1 or SEQ2 step, with chance and conditions. | Built, not yet run on a device |
+| Chords | Up to four notes on a SEQ1 or SEQ2 step, with chance and conditions. | Built, not yet run on a device; not on the page until it is |
 
 Versions and their changes are in [`patches/mods.json`](patches/mods.json); every
 version built, with the SHA-256 of its update file, is in

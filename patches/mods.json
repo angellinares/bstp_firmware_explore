@@ -13,7 +13,7 @@
  },
  "poly": {
   "name": "Chords (with step chance and conditions)",
-  "page": true,
+  "page": false,
   "hardware": "not run on a device yet",
   "summary": "Up to four notes on a SEQ1 or SEQ2 step. Includes step chance and conditions. Chords are saved in a part of the storage chip the stock firmware does not use.",
   "changes": [
