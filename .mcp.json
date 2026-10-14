@@ -1,8 +1,0 @@
-{
-  "mcpServers": {
-    "rea-wsl": {
-      "command": "wsl.exe",
-      "args": ["--", "rea-mcp"]
-    }
-  }
-}

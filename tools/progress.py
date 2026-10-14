@@ -1,4 +1,4 @@
-"""Live progress of long jobs (Ghidra dumps, patch builds, tests, REA runs), for the pane.
+"""Live progress of long jobs (Ghidra dumps, patch builds, tests), for the pane.
 
 A job writes one small JSON file under out/progress/ and keeps it current:
 
@@ -22,9 +22,9 @@ For a command that knows nothing of this module:
 runs it, passes its output through, keeps the last line as the job's detail and the exit
 code as its state.
 
-For work with no process to wrap (REA calls run inside its server):
+For work with no process to wrap:
 
-    python tools/progress.py begin --name "rea: callers" [--total 5]    # prints the job id
+    python tools/progress.py begin --name "callers" [--total 5]    # prints the job id
     python tools/progress.py step ID [--done 2] [--step TEXT]
     python tools/progress.py end ID [--failed] [--detail TEXT]
 

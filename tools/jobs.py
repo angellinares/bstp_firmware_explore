@@ -1,4 +1,4 @@
-"""The live progress pane: every running job (Ghidra dumps, builds, tests, REA runs), redrawn each second.
+"""The live progress pane: every running job (Ghidra dumps, builds, tests), redrawn each second.
 
     python tools/jobs.py [--keep 10] [--interval 1]
 

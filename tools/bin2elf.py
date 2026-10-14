@@ -2,8 +2,7 @@
 
     python tools/bin2elf.py out/bsp_2.0.1.6.bin out/bsp_2.0.1.6.elf
 
-REA's open_binary takes no base address or processor, so it cannot open the
-raw image. The ELF says: ARM, little-endian, loaded at 0x08003000, entry at
+The ELF says: ARM, little-endian, loaded at 0x08003000, entry at
 the reset vector, plus an empty RAM segment at 0x20000000.
 """
 import struct
