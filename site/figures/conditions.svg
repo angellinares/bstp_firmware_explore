@@ -1,0 +1,345 @@
+<svg xmlns='http://www.w3.org/2000/svg' width='488' height='598' viewBox='0 0 488 598'>
+<style>:root{--ink:#1c1c1a;--muted:#66655f;--line:#d5d3ca;--on:#256b3a;--fill:#b3401f;--bg:#fff}@media (prefers-color-scheme:dark){:root{--ink:#ecebe6;--muted:#a3a199;--line:#3a3934;--on:#7ec994;--fill:#f08a5d;--bg:#20201d}}</style>
+<rect style='fill:var(--bg)' width='100%' height='100%'/>
+<text style='fill:var(--ink)' x='10' y='22' font-size='13' text-anchor='start' font-weight='normal' font-family='Helvetica, Arial, sans-serif'>The passes on which a step plays, for each condition</text>
+<text style='fill:var(--muted)' x='82' y='46' font-size='11' text-anchor='middle' font-weight='normal' font-family='Helvetica, Arial, sans-serif'>1</text>
+<text style='fill:var(--muted)' x='106' y='46' font-size='11' text-anchor='middle' font-weight='normal' font-family='Helvetica, Arial, sans-serif'>2</text>
+<text style='fill:var(--muted)' x='130' y='46' font-size='11' text-anchor='middle' font-weight='normal' font-family='Helvetica, Arial, sans-serif'>3</text>
+<text style='fill:var(--muted)' x='154' y='46' font-size='11' text-anchor='middle' font-weight='normal' font-family='Helvetica, Arial, sans-serif'>4</text>
+<text style='fill:var(--muted)' x='178' y='46' font-size='11' text-anchor='middle' font-weight='normal' font-family='Helvetica, Arial, sans-serif'>5</text>
+<text style='fill:var(--muted)' x='202' y='46' font-size='11' text-anchor='middle' font-weight='normal' font-family='Helvetica, Arial, sans-serif'>6</text>
+<text style='fill:var(--muted)' x='226' y='46' font-size='11' text-anchor='middle' font-weight='normal' font-family='Helvetica, Arial, sans-serif'>7</text>
+<text style='fill:var(--muted)' x='250' y='46' font-size='11' text-anchor='middle' font-weight='normal' font-family='Helvetica, Arial, sans-serif'>8</text>
+<text style='fill:var(--muted)' x='274' y='46' font-size='11' text-anchor='middle' font-weight='normal' font-family='Helvetica, Arial, sans-serif'>9</text>
+<text style='fill:var(--muted)' x='298' y='46' font-size='11' text-anchor='middle' font-weight='normal' font-family='Helvetica, Arial, sans-serif'>10</text>
+<text style='fill:var(--muted)' x='322' y='46' font-size='11' text-anchor='middle' font-weight='normal' font-family='Helvetica, Arial, sans-serif'>11</text>
+<text style='fill:var(--muted)' x='346' y='46' font-size='11' text-anchor='middle' font-weight='normal' font-family='Helvetica, Arial, sans-serif'>12</text>
+<text style='fill:var(--muted)' x='62' y='46' font-size='11' text-anchor='end' font-weight='normal' font-family='Helvetica, Arial, sans-serif'>pass</text>
+<g opacity='1'>
+<text style='fill:var(--ink)' x='60' y='72' font-size='13' text-anchor='end' font-weight='bold' font-family='Consolas, Menlo, monospace'>1-1</text>
+<rect style='fill:var(--on);stroke:var(--on)' x='72' y='58' width='20' height='20' rx='3'/>
+<rect style='fill:var(--on);stroke:var(--on)' x='96' y='58' width='20' height='20' rx='3'/>
+<rect style='fill:var(--on);stroke:var(--on)' x='120' y='58' width='20' height='20' rx='3'/>
+<rect style='fill:var(--on);stroke:var(--on)' x='144' y='58' width='20' height='20' rx='3'/>
+<rect style='fill:var(--on);stroke:var(--on)' x='168' y='58' width='20' height='20' rx='3'/>
+<rect style='fill:var(--on);stroke:var(--on)' x='192' y='58' width='20' height='20' rx='3'/>
+<rect style='fill:var(--on);stroke:var(--on)' x='216' y='58' width='20' height='20' rx='3'/>
+<rect style='fill:var(--on);stroke:var(--on)' x='240' y='58' width='20' height='20' rx='3'/>
+<rect style='fill:var(--on);stroke:var(--on)' x='264' y='58' width='20' height='20' rx='3'/>
+<rect style='fill:var(--on);stroke:var(--on)' x='288' y='58' width='20' height='20' rx='3'/>
+<rect style='fill:var(--on);stroke:var(--on)' x='312' y='58' width='20' height='20' rx='3'/>
+<rect style='fill:var(--on);stroke:var(--on)' x='336' y='58' width='20' height='20' rx='3'/>
+</g>
+<g opacity='1'>
+<line style='stroke:var(--line)' x1='4' y1='78' x2='358' y2='78'/>
+<text style='fill:var(--ink)' x='60' y='96' font-size='13' text-anchor='end' font-weight='bold' font-family='Consolas, Menlo, monospace'>1St</text>
+<rect style='fill:var(--on);stroke:var(--on)' x='72' y='82' width='20' height='20' rx='3'/>
+<rect style='fill:var(--bg);stroke:var(--line)' x='96' y='82' width='20' height='20' rx='3'/>
+<rect style='fill:var(--bg);stroke:var(--line)' x='120' y='82' width='20' height='20' rx='3'/>
+<rect style='fill:var(--bg);stroke:var(--line)' x='144' y='82' width='20' height='20' rx='3'/>
+<rect style='fill:var(--bg);stroke:var(--line)' x='168' y='82' width='20' height='20' rx='3'/>
+<rect style='fill:var(--bg);stroke:var(--line)' x='192' y='82' width='20' height='20' rx='3'/>
+<rect style='fill:var(--bg);stroke:var(--line)' x='216' y='82' width='20' height='20' rx='3'/>
+<rect style='fill:var(--bg);stroke:var(--line)' x='240' y='82' width='20' height='20' rx='3'/>
+<rect style='fill:var(--bg);stroke:var(--line)' x='264' y='82' width='20' height='20' rx='3'/>
+<rect style='fill:var(--bg);stroke:var(--line)' x='288' y='82' width='20' height='20' rx='3'/>
+<rect style='fill:var(--bg);stroke:var(--line)' x='312' y='82' width='20' height='20' rx='3'/>
+<rect style='fill:var(--bg);stroke:var(--line)' x='336' y='82' width='20' height='20' rx='3'/>
+</g>
+<g opacity='1'>
+<text style='fill:var(--ink)' x='60' y='120' font-size='13' text-anchor='end' font-weight='bold' font-family='Consolas, Menlo, monospace'>n1S</text>
+<rect style='fill:var(--bg);stroke:var(--line)' x='72' y='106' width='20' height='20' rx='3'/>
+<rect style='fill:var(--on);stroke:var(--on)' x='96' y='106' width='20' height='20' rx='3'/>
+<rect style='fill:var(--on);stroke:var(--on)' x='120' y='106' width='20' height='20' rx='3'/>
+<rect style='fill:var(--on);stroke:var(--on)' x='144' y='106' width='20' height='20' rx='3'/>
+<rect style='fill:var(--on);stroke:var(--on)' x='168' y='106' width='20' height='20' rx='3'/>
+<rect style='fill:var(--on);stroke:var(--on)' x='192' y='106' width='20' height='20' rx='3'/>
+<rect style='fill:var(--on);stroke:var(--on)' x='216' y='106' width='20' height='20' rx='3'/>
+<rect style='fill:var(--on);stroke:var(--on)' x='240' y='106' width='20' height='20' rx='3'/>
+<rect style='fill:var(--on);stroke:var(--on)' x='264' y='106' width='20' height='20' rx='3'/>
+<rect style='fill:var(--on);stroke:var(--on)' x='288' y='106' width='20' height='20' rx='3'/>
+<rect style='fill:var(--on);stroke:var(--on)' x='312' y='106' width='20' height='20' rx='3'/>
+<rect style='fill:var(--on);stroke:var(--on)' x='336' y='106' width='20' height='20' rx='3'/>
+</g>
+<g opacity='1'>
+<line style='stroke:var(--line)' x1='4' y1='126' x2='358' y2='126'/>
+<text style='fill:var(--ink)' x='60' y='144' font-size='13' text-anchor='end' font-weight='bold' font-family='Consolas, Menlo, monospace'>1-2</text>
+<rect style='fill:var(--on);stroke:var(--on)' x='72' y='130' width='20' height='20' rx='3'/>
+<rect style='fill:var(--bg);stroke:var(--line)' x='96' y='130' width='20' height='20' rx='3'/>
+<rect style='fill:var(--on);stroke:var(--on)' x='120' y='130' width='20' height='20' rx='3'/>
+<rect style='fill:var(--bg);stroke:var(--line)' x='144' y='130' width='20' height='20' rx='3'/>
+<rect style='fill:var(--on);stroke:var(--on)' x='168' y='130' width='20' height='20' rx='3'/>
+<rect style='fill:var(--bg);stroke:var(--line)' x='192' y='130' width='20' height='20' rx='3'/>
+<rect style='fill:var(--on);stroke:var(--on)' x='216' y='130' width='20' height='20' rx='3'/>
+<rect style='fill:var(--bg);stroke:var(--line)' x='240' y='130' width='20' height='20' rx='3'/>
+<rect style='fill:var(--on);stroke:var(--on)' x='264' y='130' width='20' height='20' rx='3'/>
+<rect style='fill:var(--bg);stroke:var(--line)' x='288' y='130' width='20' height='20' rx='3'/>
+<rect style='fill:var(--on);stroke:var(--on)' x='312' y='130' width='20' height='20' rx='3'/>
+<rect style='fill:var(--bg);stroke:var(--line)' x='336' y='130' width='20' height='20' rx='3'/>
+</g>
+<g opacity='0.35'>
+<text style='fill:var(--ink)' x='60' y='168' font-size='13' text-anchor='end' font-weight='bold' font-family='Consolas, Menlo, monospace'>n12</text>
+<rect style='fill:var(--bg);stroke:var(--line)' x='72' y='154' width='20' height='20' rx='3'/>
+<rect style='fill:var(--on);stroke:var(--on)' x='96' y='154' width='20' height='20' rx='3'/>
+<rect style='fill:var(--bg);stroke:var(--line)' x='120' y='154' width='20' height='20' rx='3'/>
+<rect style='fill:var(--on);stroke:var(--on)' x='144' y='154' width='20' height='20' rx='3'/>
+<rect style='fill:var(--bg);stroke:var(--line)' x='168' y='154' width='20' height='20' rx='3'/>
+<rect style='fill:var(--on);stroke:var(--on)' x='192' y='154' width='20' height='20' rx='3'/>
+<rect style='fill:var(--bg);stroke:var(--line)' x='216' y='154' width='20' height='20' rx='3'/>
+<rect style='fill:var(--on);stroke:var(--on)' x='240' y='154' width='20' height='20' rx='3'/>
+<rect style='fill:var(--bg);stroke:var(--line)' x='264' y='154' width='20' height='20' rx='3'/>
+<rect style='fill:var(--on);stroke:var(--on)' x='288' y='154' width='20' height='20' rx='3'/>
+<rect style='fill:var(--bg);stroke:var(--line)' x='312' y='154' width='20' height='20' rx='3'/>
+<rect style='fill:var(--on);stroke:var(--on)' x='336' y='154' width='20' height='20' rx='3'/>
+</g>
+<text style='fill:var(--ink)' x='368' y='163' font-size='11' text-anchor='start' font-weight='normal' font-family='Helvetica, Arial, sans-serif'>not in the firmware,</text>
+<text style='fill:var(--muted)' x='368' y='176' font-size='11' text-anchor='start' font-weight='normal' font-family='Helvetica, Arial, sans-serif'>same as 2-2</text>
+<g opacity='1'>
+<text style='fill:var(--ink)' x='60' y='192' font-size='13' text-anchor='end' font-weight='bold' font-family='Consolas, Menlo, monospace'>2-2</text>
+<rect style='fill:var(--bg);stroke:var(--line)' x='72' y='178' width='20' height='20' rx='3'/>
+<rect style='fill:var(--on);stroke:var(--on)' x='96' y='178' width='20' height='20' rx='3'/>
+<rect style='fill:var(--bg);stroke:var(--line)' x='120' y='178' width='20' height='20' rx='3'/>
+<rect style='fill:var(--on);stroke:var(--on)' x='144' y='178' width='20' height='20' rx='3'/>
+<rect style='fill:var(--bg);stroke:var(--line)' x='168' y='178' width='20' height='20' rx='3'/>
+<rect style='fill:var(--on);stroke:var(--on)' x='192' y='178' width='20' height='20' rx='3'/>
+<rect style='fill:var(--bg);stroke:var(--line)' x='216' y='178' width='20' height='20' rx='3'/>
+<rect style='fill:var(--on);stroke:var(--on)' x='240' y='178' width='20' height='20' rx='3'/>
+<rect style='fill:var(--bg);stroke:var(--line)' x='264' y='178' width='20' height='20' rx='3'/>
+<rect style='fill:var(--on);stroke:var(--on)' x='288' y='178' width='20' height='20' rx='3'/>
+<rect style='fill:var(--bg);stroke:var(--line)' x='312' y='178' width='20' height='20' rx='3'/>
+<rect style='fill:var(--on);stroke:var(--on)' x='336' y='178' width='20' height='20' rx='3'/>
+</g>
+<g opacity='0.35'>
+<text style='fill:var(--ink)' x='60' y='216' font-size='13' text-anchor='end' font-weight='bold' font-family='Consolas, Menlo, monospace'>n22</text>
+<rect style='fill:var(--on);stroke:var(--on)' x='72' y='202' width='20' height='20' rx='3'/>
+<rect style='fill:var(--bg);stroke:var(--line)' x='96' y='202' width='20' height='20' rx='3'/>
+<rect style='fill:var(--on);stroke:var(--on)' x='120' y='202' width='20' height='20' rx='3'/>
+<rect style='fill:var(--bg);stroke:var(--line)' x='144' y='202' width='20' height='20' rx='3'/>
+<rect style='fill:var(--on);stroke:var(--on)' x='168' y='202' width='20' height='20' rx='3'/>
+<rect style='fill:var(--bg);stroke:var(--line)' x='192' y='202' width='20' height='20' rx='3'/>
+<rect style='fill:var(--on);stroke:var(--on)' x='216' y='202' width='20' height='20' rx='3'/>
+<rect style='fill:var(--bg);stroke:var(--line)' x='240' y='202' width='20' height='20' rx='3'/>
+<rect style='fill:var(--on);stroke:var(--on)' x='264' y='202' width='20' height='20' rx='3'/>
+<rect style='fill:var(--bg);stroke:var(--line)' x='288' y='202' width='20' height='20' rx='3'/>
+<rect style='fill:var(--on);stroke:var(--on)' x='312' y='202' width='20' height='20' rx='3'/>
+<rect style='fill:var(--bg);stroke:var(--line)' x='336' y='202' width='20' height='20' rx='3'/>
+</g>
+<text style='fill:var(--ink)' x='368' y='211' font-size='11' text-anchor='start' font-weight='normal' font-family='Helvetica, Arial, sans-serif'>not in the firmware,</text>
+<text style='fill:var(--muted)' x='368' y='224' font-size='11' text-anchor='start' font-weight='normal' font-family='Helvetica, Arial, sans-serif'>same as 1-2</text>
+<g opacity='1'>
+<line style='stroke:var(--line)' x1='4' y1='222' x2='358' y2='222'/>
+<text style='fill:var(--ink)' x='60' y='240' font-size='13' text-anchor='end' font-weight='bold' font-family='Consolas, Menlo, monospace'>1-3</text>
+<rect style='fill:var(--on);stroke:var(--on)' x='72' y='226' width='20' height='20' rx='3'/>
+<rect style='fill:var(--bg);stroke:var(--line)' x='96' y='226' width='20' height='20' rx='3'/>
+<rect style='fill:var(--bg);stroke:var(--line)' x='120' y='226' width='20' height='20' rx='3'/>
+<rect style='fill:var(--on);stroke:var(--on)' x='144' y='226' width='20' height='20' rx='3'/>
+<rect style='fill:var(--bg);stroke:var(--line)' x='168' y='226' width='20' height='20' rx='3'/>
+<rect style='fill:var(--bg);stroke:var(--line)' x='192' y='226' width='20' height='20' rx='3'/>
+<rect style='fill:var(--on);stroke:var(--on)' x='216' y='226' width='20' height='20' rx='3'/>
+<rect style='fill:var(--bg);stroke:var(--line)' x='240' y='226' width='20' height='20' rx='3'/>
+<rect style='fill:var(--bg);stroke:var(--line)' x='264' y='226' width='20' height='20' rx='3'/>
+<rect style='fill:var(--on);stroke:var(--on)' x='288' y='226' width='20' height='20' rx='3'/>
+<rect style='fill:var(--bg);stroke:var(--line)' x='312' y='226' width='20' height='20' rx='3'/>
+<rect style='fill:var(--bg);stroke:var(--line)' x='336' y='226' width='20' height='20' rx='3'/>
+</g>
+<g opacity='1'>
+<text style='fill:var(--ink)' x='60' y='264' font-size='13' text-anchor='end' font-weight='bold' font-family='Consolas, Menlo, monospace'>n13</text>
+<rect style='fill:var(--bg);stroke:var(--line)' x='72' y='250' width='20' height='20' rx='3'/>
+<rect style='fill:var(--on);stroke:var(--on)' x='96' y='250' width='20' height='20' rx='3'/>
+<rect style='fill:var(--on);stroke:var(--on)' x='120' y='250' width='20' height='20' rx='3'/>
+<rect style='fill:var(--bg);stroke:var(--line)' x='144' y='250' width='20' height='20' rx='3'/>
+<rect style='fill:var(--on);stroke:var(--on)' x='168' y='250' width='20' height='20' rx='3'/>
+<rect style='fill:var(--on);stroke:var(--on)' x='192' y='250' width='20' height='20' rx='3'/>
+<rect style='fill:var(--bg);stroke:var(--line)' x='216' y='250' width='20' height='20' rx='3'/>
+<rect style='fill:var(--on);stroke:var(--on)' x='240' y='250' width='20' height='20' rx='3'/>
+<rect style='fill:var(--on);stroke:var(--on)' x='264' y='250' width='20' height='20' rx='3'/>
+<rect style='fill:var(--bg);stroke:var(--line)' x='288' y='250' width='20' height='20' rx='3'/>
+<rect style='fill:var(--on);stroke:var(--on)' x='312' y='250' width='20' height='20' rx='3'/>
+<rect style='fill:var(--on);stroke:var(--on)' x='336' y='250' width='20' height='20' rx='3'/>
+</g>
+<g opacity='1'>
+<text style='fill:var(--ink)' x='60' y='288' font-size='13' text-anchor='end' font-weight='bold' font-family='Consolas, Menlo, monospace'>2-3</text>
+<rect style='fill:var(--bg);stroke:var(--line)' x='72' y='274' width='20' height='20' rx='3'/>
+<rect style='fill:var(--on);stroke:var(--on)' x='96' y='274' width='20' height='20' rx='3'/>
+<rect style='fill:var(--bg);stroke:var(--line)' x='120' y='274' width='20' height='20' rx='3'/>
+<rect style='fill:var(--bg);stroke:var(--line)' x='144' y='274' width='20' height='20' rx='3'/>
+<rect style='fill:var(--on);stroke:var(--on)' x='168' y='274' width='20' height='20' rx='3'/>
+<rect style='fill:var(--bg);stroke:var(--line)' x='192' y='274' width='20' height='20' rx='3'/>
+<rect style='fill:var(--bg);stroke:var(--line)' x='216' y='274' width='20' height='20' rx='3'/>
+<rect style='fill:var(--on);stroke:var(--on)' x='240' y='274' width='20' height='20' rx='3'/>
+<rect style='fill:var(--bg);stroke:var(--line)' x='264' y='274' width='20' height='20' rx='3'/>
+<rect style='fill:var(--bg);stroke:var(--line)' x='288' y='274' width='20' height='20' rx='3'/>
+<rect style='fill:var(--on);stroke:var(--on)' x='312' y='274' width='20' height='20' rx='3'/>
+<rect style='fill:var(--bg);stroke:var(--line)' x='336' y='274' width='20' height='20' rx='3'/>
+</g>
+<g opacity='1'>
+<text style='fill:var(--ink)' x='60' y='312' font-size='13' text-anchor='end' font-weight='bold' font-family='Consolas, Menlo, monospace'>n23</text>
+<rect style='fill:var(--on);stroke:var(--on)' x='72' y='298' width='20' height='20' rx='3'/>
+<rect style='fill:var(--bg);stroke:var(--line)' x='96' y='298' width='20' height='20' rx='3'/>
+<rect style='fill:var(--on);stroke:var(--on)' x='120' y='298' width='20' height='20' rx='3'/>
+<rect style='fill:var(--on);stroke:var(--on)' x='144' y='298' width='20' height='20' rx='3'/>
+<rect style='fill:var(--bg);stroke:var(--line)' x='168' y='298' width='20' height='20' rx='3'/>
+<rect style='fill:var(--on);stroke:var(--on)' x='192' y='298' width='20' height='20' rx='3'/>
+<rect style='fill:var(--on);stroke:var(--on)' x='216' y='298' width='20' height='20' rx='3'/>
+<rect style='fill:var(--bg);stroke:var(--line)' x='240' y='298' width='20' height='20' rx='3'/>
+<rect style='fill:var(--on);stroke:var(--on)' x='264' y='298' width='20' height='20' rx='3'/>
+<rect style='fill:var(--on);stroke:var(--on)' x='288' y='298' width='20' height='20' rx='3'/>
+<rect style='fill:var(--bg);stroke:var(--line)' x='312' y='298' width='20' height='20' rx='3'/>
+<rect style='fill:var(--on);stroke:var(--on)' x='336' y='298' width='20' height='20' rx='3'/>
+</g>
+<g opacity='1'>
+<text style='fill:var(--ink)' x='60' y='336' font-size='13' text-anchor='end' font-weight='bold' font-family='Consolas, Menlo, monospace'>3-3</text>
+<rect style='fill:var(--bg);stroke:var(--line)' x='72' y='322' width='20' height='20' rx='3'/>
+<rect style='fill:var(--bg);stroke:var(--line)' x='96' y='322' width='20' height='20' rx='3'/>
+<rect style='fill:var(--on);stroke:var(--on)' x='120' y='322' width='20' height='20' rx='3'/>
+<rect style='fill:var(--bg);stroke:var(--line)' x='144' y='322' width='20' height='20' rx='3'/>
+<rect style='fill:var(--bg);stroke:var(--line)' x='168' y='322' width='20' height='20' rx='3'/>
+<rect style='fill:var(--on);stroke:var(--on)' x='192' y='322' width='20' height='20' rx='3'/>
+<rect style='fill:var(--bg);stroke:var(--line)' x='216' y='322' width='20' height='20' rx='3'/>
+<rect style='fill:var(--bg);stroke:var(--line)' x='240' y='322' width='20' height='20' rx='3'/>
+<rect style='fill:var(--on);stroke:var(--on)' x='264' y='322' width='20' height='20' rx='3'/>
+<rect style='fill:var(--bg);stroke:var(--line)' x='288' y='322' width='20' height='20' rx='3'/>
+<rect style='fill:var(--bg);stroke:var(--line)' x='312' y='322' width='20' height='20' rx='3'/>
+<rect style='fill:var(--on);stroke:var(--on)' x='336' y='322' width='20' height='20' rx='3'/>
+</g>
+<g opacity='1'>
+<text style='fill:var(--ink)' x='60' y='360' font-size='13' text-anchor='end' font-weight='bold' font-family='Consolas, Menlo, monospace'>n33</text>
+<rect style='fill:var(--on);stroke:var(--on)' x='72' y='346' width='20' height='20' rx='3'/>
+<rect style='fill:var(--on);stroke:var(--on)' x='96' y='346' width='20' height='20' rx='3'/>
+<rect style='fill:var(--bg);stroke:var(--line)' x='120' y='346' width='20' height='20' rx='3'/>
+<rect style='fill:var(--on);stroke:var(--on)' x='144' y='346' width='20' height='20' rx='3'/>
+<rect style='fill:var(--on);stroke:var(--on)' x='168' y='346' width='20' height='20' rx='3'/>
+<rect style='fill:var(--bg);stroke:var(--line)' x='192' y='346' width='20' height='20' rx='3'/>
+<rect style='fill:var(--on);stroke:var(--on)' x='216' y='346' width='20' height='20' rx='3'/>
+<rect style='fill:var(--on);stroke:var(--on)' x='240' y='346' width='20' height='20' rx='3'/>
+<rect style='fill:var(--bg);stroke:var(--line)' x='264' y='346' width='20' height='20' rx='3'/>
+<rect style='fill:var(--on);stroke:var(--on)' x='288' y='346' width='20' height='20' rx='3'/>
+<rect style='fill:var(--on);stroke:var(--on)' x='312' y='346' width='20' height='20' rx='3'/>
+<rect style='fill:var(--bg);stroke:var(--line)' x='336' y='346' width='20' height='20' rx='3'/>
+</g>
+<g opacity='1'>
+<line style='stroke:var(--line)' x1='4' y1='366' x2='358' y2='366'/>
+<text style='fill:var(--ink)' x='60' y='384' font-size='13' text-anchor='end' font-weight='bold' font-family='Consolas, Menlo, monospace'>1-4</text>
+<rect style='fill:var(--on);stroke:var(--on)' x='72' y='370' width='20' height='20' rx='3'/>
+<rect style='fill:var(--bg);stroke:var(--line)' x='96' y='370' width='20' height='20' rx='3'/>
+<rect style='fill:var(--bg);stroke:var(--line)' x='120' y='370' width='20' height='20' rx='3'/>
+<rect style='fill:var(--bg);stroke:var(--line)' x='144' y='370' width='20' height='20' rx='3'/>
+<rect style='fill:var(--on);stroke:var(--on)' x='168' y='370' width='20' height='20' rx='3'/>
+<rect style='fill:var(--bg);stroke:var(--line)' x='192' y='370' width='20' height='20' rx='3'/>
+<rect style='fill:var(--bg);stroke:var(--line)' x='216' y='370' width='20' height='20' rx='3'/>
+<rect style='fill:var(--bg);stroke:var(--line)' x='240' y='370' width='20' height='20' rx='3'/>
+<rect style='fill:var(--on);stroke:var(--on)' x='264' y='370' width='20' height='20' rx='3'/>
+<rect style='fill:var(--bg);stroke:var(--line)' x='288' y='370' width='20' height='20' rx='3'/>
+<rect style='fill:var(--bg);stroke:var(--line)' x='312' y='370' width='20' height='20' rx='3'/>
+<rect style='fill:var(--bg);stroke:var(--line)' x='336' y='370' width='20' height='20' rx='3'/>
+</g>
+<g opacity='1'>
+<text style='fill:var(--ink)' x='60' y='408' font-size='13' text-anchor='end' font-weight='bold' font-family='Consolas, Menlo, monospace'>n14</text>
+<rect style='fill:var(--bg);stroke:var(--line)' x='72' y='394' width='20' height='20' rx='3'/>
+<rect style='fill:var(--on);stroke:var(--on)' x='96' y='394' width='20' height='20' rx='3'/>
+<rect style='fill:var(--on);stroke:var(--on)' x='120' y='394' width='20' height='20' rx='3'/>
+<rect style='fill:var(--on);stroke:var(--on)' x='144' y='394' width='20' height='20' rx='3'/>
+<rect style='fill:var(--bg);stroke:var(--line)' x='168' y='394' width='20' height='20' rx='3'/>
+<rect style='fill:var(--on);stroke:var(--on)' x='192' y='394' width='20' height='20' rx='3'/>
+<rect style='fill:var(--on);stroke:var(--on)' x='216' y='394' width='20' height='20' rx='3'/>
+<rect style='fill:var(--on);stroke:var(--on)' x='240' y='394' width='20' height='20' rx='3'/>
+<rect style='fill:var(--bg);stroke:var(--line)' x='264' y='394' width='20' height='20' rx='3'/>
+<rect style='fill:var(--on);stroke:var(--on)' x='288' y='394' width='20' height='20' rx='3'/>
+<rect style='fill:var(--on);stroke:var(--on)' x='312' y='394' width='20' height='20' rx='3'/>
+<rect style='fill:var(--on);stroke:var(--on)' x='336' y='394' width='20' height='20' rx='3'/>
+</g>
+<g opacity='1'>
+<text style='fill:var(--ink)' x='60' y='432' font-size='13' text-anchor='end' font-weight='bold' font-family='Consolas, Menlo, monospace'>2-4</text>
+<rect style='fill:var(--bg);stroke:var(--line)' x='72' y='418' width='20' height='20' rx='3'/>
+<rect style='fill:var(--on);stroke:var(--on)' x='96' y='418' width='20' height='20' rx='3'/>
+<rect style='fill:var(--bg);stroke:var(--line)' x='120' y='418' width='20' height='20' rx='3'/>
+<rect style='fill:var(--bg);stroke:var(--line)' x='144' y='418' width='20' height='20' rx='3'/>
+<rect style='fill:var(--bg);stroke:var(--line)' x='168' y='418' width='20' height='20' rx='3'/>
+<rect style='fill:var(--on);stroke:var(--on)' x='192' y='418' width='20' height='20' rx='3'/>
+<rect style='fill:var(--bg);stroke:var(--line)' x='216' y='418' width='20' height='20' rx='3'/>
+<rect style='fill:var(--bg);stroke:var(--line)' x='240' y='418' width='20' height='20' rx='3'/>
+<rect style='fill:var(--bg);stroke:var(--line)' x='264' y='418' width='20' height='20' rx='3'/>
+<rect style='fill:var(--on);stroke:var(--on)' x='288' y='418' width='20' height='20' rx='3'/>
+<rect style='fill:var(--bg);stroke:var(--line)' x='312' y='418' width='20' height='20' rx='3'/>
+<rect style='fill:var(--bg);stroke:var(--line)' x='336' y='418' width='20' height='20' rx='3'/>
+</g>
+<g opacity='1'>
+<text style='fill:var(--ink)' x='60' y='456' font-size='13' text-anchor='end' font-weight='bold' font-family='Consolas, Menlo, monospace'>n24</text>
+<rect style='fill:var(--on);stroke:var(--on)' x='72' y='442' width='20' height='20' rx='3'/>
+<rect style='fill:var(--bg);stroke:var(--line)' x='96' y='442' width='20' height='20' rx='3'/>
+<rect style='fill:var(--on);stroke:var(--on)' x='120' y='442' width='20' height='20' rx='3'/>
+<rect style='fill:var(--on);stroke:var(--on)' x='144' y='442' width='20' height='20' rx='3'/>
+<rect style='fill:var(--on);stroke:var(--on)' x='168' y='442' width='20' height='20' rx='3'/>
+<rect style='fill:var(--bg);stroke:var(--line)' x='192' y='442' width='20' height='20' rx='3'/>
+<rect style='fill:var(--on);stroke:var(--on)' x='216' y='442' width='20' height='20' rx='3'/>
+<rect style='fill:var(--on);stroke:var(--on)' x='240' y='442' width='20' height='20' rx='3'/>
+<rect style='fill:var(--on);stroke:var(--on)' x='264' y='442' width='20' height='20' rx='3'/>
+<rect style='fill:var(--bg);stroke:var(--line)' x='288' y='442' width='20' height='20' rx='3'/>
+<rect style='fill:var(--on);stroke:var(--on)' x='312' y='442' width='20' height='20' rx='3'/>
+<rect style='fill:var(--on);stroke:var(--on)' x='336' y='442' width='20' height='20' rx='3'/>
+</g>
+<g opacity='1'>
+<text style='fill:var(--ink)' x='60' y='480' font-size='13' text-anchor='end' font-weight='bold' font-family='Consolas, Menlo, monospace'>3-4</text>
+<rect style='fill:var(--bg);stroke:var(--line)' x='72' y='466' width='20' height='20' rx='3'/>
+<rect style='fill:var(--bg);stroke:var(--line)' x='96' y='466' width='20' height='20' rx='3'/>
+<rect style='fill:var(--on);stroke:var(--on)' x='120' y='466' width='20' height='20' rx='3'/>
+<rect style='fill:var(--bg);stroke:var(--line)' x='144' y='466' width='20' height='20' rx='3'/>
+<rect style='fill:var(--bg);stroke:var(--line)' x='168' y='466' width='20' height='20' rx='3'/>
+<rect style='fill:var(--bg);stroke:var(--line)' x='192' y='466' width='20' height='20' rx='3'/>
+<rect style='fill:var(--on);stroke:var(--on)' x='216' y='466' width='20' height='20' rx='3'/>
+<rect style='fill:var(--bg);stroke:var(--line)' x='240' y='466' width='20' height='20' rx='3'/>
+<rect style='fill:var(--bg);stroke:var(--line)' x='264' y='466' width='20' height='20' rx='3'/>
+<rect style='fill:var(--bg);stroke:var(--line)' x='288' y='466' width='20' height='20' rx='3'/>
+<rect style='fill:var(--on);stroke:var(--on)' x='312' y='466' width='20' height='20' rx='3'/>
+<rect style='fill:var(--bg);stroke:var(--line)' x='336' y='466' width='20' height='20' rx='3'/>
+</g>
+<g opacity='1'>
+<text style='fill:var(--ink)' x='60' y='504' font-size='13' text-anchor='end' font-weight='bold' font-family='Consolas, Menlo, monospace'>n34</text>
+<rect style='fill:var(--on);stroke:var(--on)' x='72' y='490' width='20' height='20' rx='3'/>
+<rect style='fill:var(--on);stroke:var(--on)' x='96' y='490' width='20' height='20' rx='3'/>
+<rect style='fill:var(--bg);stroke:var(--line)' x='120' y='490' width='20' height='20' rx='3'/>
+<rect style='fill:var(--on);stroke:var(--on)' x='144' y='490' width='20' height='20' rx='3'/>
+<rect style='fill:var(--on);stroke:var(--on)' x='168' y='490' width='20' height='20' rx='3'/>
+<rect style='fill:var(--on);stroke:var(--on)' x='192' y='490' width='20' height='20' rx='3'/>
+<rect style='fill:var(--bg);stroke:var(--line)' x='216' y='490' width='20' height='20' rx='3'/>
+<rect style='fill:var(--on);stroke:var(--on)' x='240' y='490' width='20' height='20' rx='3'/>
+<rect style='fill:var(--on);stroke:var(--on)' x='264' y='490' width='20' height='20' rx='3'/>
+<rect style='fill:var(--on);stroke:var(--on)' x='288' y='490' width='20' height='20' rx='3'/>
+<rect style='fill:var(--bg);stroke:var(--line)' x='312' y='490' width='20' height='20' rx='3'/>
+<rect style='fill:var(--on);stroke:var(--on)' x='336' y='490' width='20' height='20' rx='3'/>
+</g>
+<g opacity='1'>
+<text style='fill:var(--ink)' x='60' y='528' font-size='13' text-anchor='end' font-weight='bold' font-family='Consolas, Menlo, monospace'>4-4</text>
+<rect style='fill:var(--bg);stroke:var(--line)' x='72' y='514' width='20' height='20' rx='3'/>
+<rect style='fill:var(--bg);stroke:var(--line)' x='96' y='514' width='20' height='20' rx='3'/>
+<rect style='fill:var(--bg);stroke:var(--line)' x='120' y='514' width='20' height='20' rx='3'/>
+<rect style='fill:var(--on);stroke:var(--on)' x='144' y='514' width='20' height='20' rx='3'/>
+<rect style='fill:var(--bg);stroke:var(--line)' x='168' y='514' width='20' height='20' rx='3'/>
+<rect style='fill:var(--bg);stroke:var(--line)' x='192' y='514' width='20' height='20' rx='3'/>
+<rect style='fill:var(--bg);stroke:var(--line)' x='216' y='514' width='20' height='20' rx='3'/>
+<rect style='fill:var(--on);stroke:var(--on)' x='240' y='514' width='20' height='20' rx='3'/>
+<rect style='fill:var(--bg);stroke:var(--line)' x='264' y='514' width='20' height='20' rx='3'/>
+<rect style='fill:var(--bg);stroke:var(--line)' x='288' y='514' width='20' height='20' rx='3'/>
+<rect style='fill:var(--bg);stroke:var(--line)' x='312' y='514' width='20' height='20' rx='3'/>
+<rect style='fill:var(--on);stroke:var(--on)' x='336' y='514' width='20' height='20' rx='3'/>
+</g>
+<g opacity='1'>
+<text style='fill:var(--ink)' x='60' y='552' font-size='13' text-anchor='end' font-weight='bold' font-family='Consolas, Menlo, monospace'>n44</text>
+<rect style='fill:var(--on);stroke:var(--on)' x='72' y='538' width='20' height='20' rx='3'/>
+<rect style='fill:var(--on);stroke:var(--on)' x='96' y='538' width='20' height='20' rx='3'/>
+<rect style='fill:var(--on);stroke:var(--on)' x='120' y='538' width='20' height='20' rx='3'/>
+<rect style='fill:var(--bg);stroke:var(--line)' x='144' y='538' width='20' height='20' rx='3'/>
+<rect style='fill:var(--on);stroke:var(--on)' x='168' y='538' width='20' height='20' rx='3'/>
+<rect style='fill:var(--on);stroke:var(--on)' x='192' y='538' width='20' height='20' rx='3'/>
+<rect style='fill:var(--on);stroke:var(--on)' x='216' y='538' width='20' height='20' rx='3'/>
+<rect style='fill:var(--bg);stroke:var(--line)' x='240' y='538' width='20' height='20' rx='3'/>
+<rect style='fill:var(--on);stroke:var(--on)' x='264' y='538' width='20' height='20' rx='3'/>
+<rect style='fill:var(--on);stroke:var(--on)' x='288' y='538' width='20' height='20' rx='3'/>
+<rect style='fill:var(--on);stroke:var(--on)' x='312' y='538' width='20' height='20' rx='3'/>
+<rect style='fill:var(--bg);stroke:var(--line)' x='336' y='538' width='20' height='20' rx='3'/>
+</g>
+<rect style='fill:var(--on)' x='70' y='570' width='16' height='16' rx='3'/>
+<text style='fill:var(--ink)' x='92' y='583' font-size='12' text-anchor='start' font-weight='normal' font-family='Helvetica, Arial, sans-serif'>the step plays</text>
+<rect style='fill:var(--bg);stroke:var(--line)' x='220' y='570' width='16' height='16' rx='3'/>
+<text style='fill:var(--ink)' x='242' y='583' font-size='12' text-anchor='start' font-weight='normal' font-family='Helvetica, Arial, sans-serif'>the step is silent</text>
+</svg>

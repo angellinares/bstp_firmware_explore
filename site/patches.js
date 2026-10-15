@@ -14,54 +14,234 @@ const PATCHES = {
     [
      "What it adds",
      [
-      "Stock firmware plays every step that is on, every time the pattern comes round. This mod lets a single step play only some of the time, in one of two ways: by chance, or on chosen passes of the pattern.",
-      "A pass is one time through the pattern. With a 16-step pattern, pass 1 is the first 16 steps after you press Play, pass 2 is the next 16, and so on.",
-      "A step has a chance or a condition, not both. Steps you never touch play exactly as before."
+      "In the stock firmware, a step that is on plays each time the pattern comes round. The mod adds two ways to make a step play only some of the time:",
+      {
+       "list": [
+        "A chance makes the step play at random, for example about half the times.",
+        "A condition makes the step play on fixed passes of the pattern. The result is the same each time you play it."
+       ]
+      },
+      "A step has a chance or a condition, not both. Steps that you do not change play as before.",
+      "A pass is one time through the pattern. In a 16-step pattern, pass 1 is the first 16 steps after you press Play. Pass 2 is the next 16 steps.",
+      "The knob names do not match the functions. The Randomness knob sets the chance. The Probability knob sets the condition.",
+      {
+       "figure": "panel.svg",
+       "alt": "Hold a step that is on, then turn Randomness or Probability. The display shows the value."
+      }
      ]
     ],
     [
-     "Chance: hold a step and turn Randomness",
+     "Set a chance",
      [
-      "The display shows a percentage. 100 is a normal step. 50 means the step plays about half the times it comes round, decided afresh each time; 25 about one time in four.",
-      "The values run from 1 to 99 in 21 stages, closer together near the two ends.",
-      "With no step held, Randomness is the normal track control."
+      {
+       "steps": [
+        "Select the track: SEQ1, SEQ2 or DRUM.",
+        "On the DRUM track, select the pad.",
+        "Hold a step that is on.",
+        "Turn the Randomness knob while you hold the step.",
+        "Read the chance on the display, in percent.",
+        "Release the step."
+       ]
+      },
+      "The step stays on after you release it.",
+      "A chance of 50 makes the step play about half the times it comes round. A chance of 25 makes it play about one time in four. The mod decides again each time the step comes round.",
+      "The chance has 21 values from 1 to 99. The values are closer together near 1 and near 99. One click of the knob moves to the next value.",
+      {
+       "figure": "chance.svg",
+       "alt": "The 21 chance values on a line from 0 to 100. The values are closer together at the two ends."
+      },
+      "To remove the chance, turn Randomness to the right until the display shows 100. A step with a chance of 100 is a normal step.",
+      "When you hold no step, the Randomness knob does its stock function."
      ]
     ],
     [
-     "Conditions: hold a step and turn Probability",
+     "Set a condition",
      [
-      "A condition makes the step play on fixed passes, so the result repeats exactly. Turning right walks through them in this order: 1-1, 1St, n1S, 1-2, n12, 2-2, n22, 1-3, n13, 2-3, n23, 3-3, n33, 1-4, n14, 2-4, n24, 3-4, n34, 4-4, n44.",
-      "1-1 is no condition: the step always plays.",
-      "A-B means: count the passes in groups of B, and play only on pass A of each group. 1-2 plays on passes 1, 3, 5, 7 and so on. 2-2 plays on passes 2, 4, 6, 8. 1-4 plays on passes 1, 5, 9. 4-4 plays on passes 4, 8, 12.",
-      "The n forms are the opposite of the same numbers: nAB plays on every pass except the one A-B would play. n14 plays on passes 2, 3, 4, then 6, 7, 8. n44 plays on passes 1, 2, 3, then 5, 6, 7.",
-      "1St plays on the first pass after Play only. n1S plays on every pass but the first.",
-      "With no step held, Probability is the normal track control."
+      {
+       "steps": [
+        "Select the track: SEQ1, SEQ2 or DRUM.",
+        "On the DRUM track, select the pad.",
+        "Hold a step that is on.",
+        "Turn the Probability knob while you hold the step.",
+        "Read the condition on the display.",
+        "Release the step."
+       ]
+      },
+      "To remove the condition, turn Probability to the left until the display shows 1-1.",
+      "When you hold no step, the Probability knob does its stock function.",
+      "When you turn Probability to the right, the display shows the conditions in this order: 1-1, 1St, n1S, 1-2, 2-2, 1-3, n13, 2-3, n23, 3-3, n33, 1-4, n14, 2-4, n24, 3-4, n34, 4-4, n44."
      ]
     ],
     [
-     "What you can do with it",
+     "How to read a condition",
      [
-      "A fill at the end of every fourth bar: put the fill's steps on 4-4.",
-      "A pattern longer than its steps: a 16-step pattern with some steps on 1-2 and others on 2-2 is a 32-step phrase. With 1-4 to 4-4 it is a 64-step phrase in 16 steps.",
-      "An intro that never comes back: 1St. A part that enters after the first time round: n1S.",
-      "Hi-hats or ghost notes that vary: a chance of 50 to 75."
+      {
+       "list": [
+        "1-1 is no condition. The step plays on each pass.",
+        "1St plays on pass 1 only.",
+        "n1S plays on each pass except pass 1.",
+        "A-B counts the passes in groups of B. The step plays on pass A of each group.",
+        "nAB is the opposite of A-B. The step plays on each pass except the pass that A-B plays on."
+       ]
+      },
+      "For example, 1-2 plays on passes 1, 3, 5, 7 and so on. 4-4 plays on passes 4, 8, 12 and so on. n44 plays on passes 1, 2, 3, then 5, 6, 7.",
+      {
+       "figure": "conditions.svg",
+       "alt": "A grid with one row for each condition and one column for each pass from 1 to 12. A filled square shows that the step plays."
+      },
+      {
+       "table": [
+        [
+         "Display",
+         "The step plays on passes"
+        ],
+        [
+         "1-1",
+         "all"
+        ],
+        [
+         "1St",
+         "1 only"
+        ],
+        [
+         "n1S",
+         "all except 1"
+        ],
+        [
+         "1-2",
+         "1, 3, 5, 7 and so on"
+        ],
+        [
+         "n12",
+         "not in the firmware: the same passes as 2-2"
+        ],
+        [
+         "2-2",
+         "2, 4, 6, 8 and so on"
+        ],
+        [
+         "n22",
+         "not in the firmware: the same passes as 1-2"
+        ],
+        [
+         "1-3",
+         "1, 4, 7, 10 and so on"
+        ],
+        [
+         "n13",
+         "2, 3, 5, 6, 8, 9 and so on"
+        ],
+        [
+         "2-3",
+         "2, 5, 8, 11 and so on"
+        ],
+        [
+         "n23",
+         "1, 3, 4, 6, 7, 9 and so on"
+        ],
+        [
+         "3-3",
+         "3, 6, 9, 12 and so on"
+        ],
+        [
+         "n33",
+         "1, 2, 4, 5, 7, 8 and so on"
+        ],
+        [
+         "1-4",
+         "1, 5, 9 and so on"
+        ],
+        [
+         "n14",
+         "2, 3, 4, 6, 7, 8 and so on"
+        ],
+        [
+         "2-4",
+         "2, 6, 10 and so on"
+        ],
+        [
+         "n24",
+         "1, 3, 4, 5, 7, 8 and so on"
+        ],
+        [
+         "3-4",
+         "3, 7, 11 and so on"
+        ],
+        [
+         "n34",
+         "1, 2, 4, 5, 6, 8 and so on"
+        ],
+        [
+         "4-4",
+         "4, 8, 12 and so on"
+        ],
+        [
+         "n44",
+         "1, 2, 3, 5, 6, 7 and so on"
+        ]
+       ]
+      },
+      "n12 and n22 are not in the firmware from version 1.3.2. n12 plays on the same passes as 2-2. n22 plays on the same passes as 1-2. The Probability knob steps over them.",
+      "Version 1.2.1 still shows n12 and n22. A step saved with n12 or n22 keeps it and plays as before."
      ]
     ],
     [
-     "Passes are counted per track",
+     "Chance and condition on one step",
      [
-      "Counting starts at 1 when you press Play from stop, and again when the pattern changes.",
-      "SEQ1 and SEQ2 each count their own passes, so tracks of different lengths drift against each other as they already do.",
-      "On the DRUM track the step buttons belong to the selected pad, and so do the chance and condition you set. Each pad counts the passes of its own length.",
-      "In alternate direction, a pass is there and back."
+      "A step keeps only the last of the two that you set.",
+      {
+       "list": [
+        "If a step has a condition, Randomness shows 100. Turn Randomness to the left to set a chance. The chance replaces the condition.",
+        "If a step has a chance, Probability shows 1-1. Turn Probability to the right to set a condition. The condition replaces the chance."
+       ]
+      }
      ]
     ],
     [
-     "Good to know",
+     "How the mod counts passes",
      [
-      "Chance and conditions are saved with the pattern when you save the project.",
-      "Turning a step off removes its chance or condition. So do the stock functions that shift or copy steps. Copying a pattern or a project keeps them.",
-      "Arturia's own firmware ignores them: a pattern saved with the mod plays every step again after you go back to stock."
+      {
+       "list": [
+        "The count starts at pass 1 when you press Play from stop.",
+        "The count starts at pass 1 again when the pattern changes.",
+        "SEQ1 and SEQ2 each count their own passes. Tracks of different lengths drift against each other, as in the stock firmware.",
+        "On the DRUM track, the step buttons show the steps of the selected pad. The chance and the condition that you set belong to that pad.",
+        "Each drum pad counts the passes of its own length.",
+        "In the alternate direction, one pass is the way there and the way back."
+       ]
+      }
+     ]
+    ],
+    [
+     "Examples",
+     [
+      "A fill at the end of each fourth bar: set the steps of the fill to 4-4.",
+      {
+       "figure": "fill.svg",
+       "alt": "A 16-step drum part over 4 passes. The kick plays on each pass. The fill on steps 14, 15 and 16 plays on pass 4 only."
+      },
+      {
+       "list": [
+        "A phrase that is longer than the pattern: set some steps of a 16-step pattern to 1-2 and others to 2-2. The result is a 32-step phrase. With 1-4, 2-4, 3-4 and 4-4, the result is a 64-step phrase.",
+        "An intro that plays one time: set its steps to 1St.",
+        "A part that starts on the second pass: set its steps to n1S.",
+        "Hi-hats or ghost notes that change: set a chance from 50 to 75."
+       ]
+      }
+     ]
+    ],
+    [
+     "Saving and copying",
+     [
+      {
+       "list": [
+        "When you save the project, the mod saves the chances and the conditions with the pattern.",
+        "When you turn a step off, the step loses its chance or condition.",
+        "The stock functions that shift or copy steps also remove them.",
+        "When you copy a pattern or a project, the copy keeps them.",
+        "Arturia's firmware ignores them. After you go back to the stock firmware, a pattern saved with the mod plays each step that is on again."
+       ]
+      }
      ]
     ]
    ],
