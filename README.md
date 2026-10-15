@@ -24,9 +24,10 @@ build tested here. You install it with MIDI Control Center, like any update.
 | Ratchets (version 1.3.1 of the mod above) | A DRUM step plays 2, 4 or 8 times inside its own length: hold the step and touch the roller strip, or record a roll finer than the track. Ratcheted steps light cyan. | Built, not yet run on a device; the page offers 1.2.1 until it is |
 | Chords | Up to four notes on a SEQ1 or SEQ2 step, with chance and conditions. | Built, not yet run on a device; not on the page until it is |
 
-How to use each mod, with what every condition plays, is under "How to use it"
-on the patch page; the same text is the `guide` in
-[`patches/mods.json`](patches/mods.json).
+How to use each mod is under "How to use it" on the patch page. The same text
+is the `guide` in [`patches/mods.json`](patches/mods.json). Step chance and
+conditions has a full guide with figures:
+[`docs/step-chance-and-conditions.md`](docs/step-chance-and-conditions.md).
 
 Versions and their changes are in [`patches/mods.json`](patches/mods.json); every
 version built, with the SHA-256 of its update file, is in

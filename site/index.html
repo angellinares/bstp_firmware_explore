@@ -108,6 +108,12 @@
     };
     const guide = document.createElement("details");
     guide.append(Object.assign(document.createElement("summary"), { textContent: "How to use it" }));
+    if (mod.doc) {
+      const more = Object.assign(document.createElement("a"), { href: mod.doc, textContent: "The full guide, with figures" });
+      const p = document.createElement("p");
+      p.append(more);
+      guide.append(p);
+    }
     for (const [title, items] of mod.guide) section(guide, title, items);
     guide.hidden = !mod.guide.length;
     const log = document.createElement("details");

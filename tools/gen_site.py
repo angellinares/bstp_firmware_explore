@@ -106,7 +106,7 @@ def build():
             sys.exit("%s: the stamp is not where the other mods have it" % name)
         data["mods"].append({"id": name, "name": mod["name"], "version": version,
                              "hardware": mod["hardware"], "summary": mod["summary"],
-                             "guide": upto(mod.get("guide", []), version, 2),
+                             "guide": upto(mod.get("guide", []), version, 2), "doc": mod.get("doc"),
                              "changes": upto(mod["changes"], version, 0),
                              "device": mod["device"], "unchecked": mod["unchecked"],
                              "emulator": [[group, scenarios(tests)] for group, tests in upto(mod["tests"], version, 2)],

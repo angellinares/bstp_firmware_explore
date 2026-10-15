@@ -2,6 +2,7 @@
  "trig": {
   "name": "Step chance and conditions",
   "page": "1.2.1",
+  "doc": "https://github.com/angellinares/bstp_firmware_explore/blob/main/docs/step-chance-and-conditions.md",
   "hardware": "1.2.1 runs on one device, 2026-10-13",
   "tests": [["Chance", "test_trig.py"], ["Conditions", "test_cond.py"], ["Drum steps", "test_drum.py"], ["Ratchets", "test_ratchet.py", "1.3.0"]],
   "device": [

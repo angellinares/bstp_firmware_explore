@@ -65,6 +65,7 @@ const PATCHES = {
      ]
     ]
    ],
+   "doc": "https://github.com/angellinares/bstp_firmware_explore/blob/main/docs/step-chance-and-conditions.md",
    "changes": [
     [
      "1.2.1",
