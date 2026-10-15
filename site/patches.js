@@ -330,8 +330,6 @@ const PATCHES = {
       "A held step that is off gets no condition",
       "The display shows the condition",
       "Other values go to the stock number display",
-      "A step saved with n12 or n22 keeps it until the knob turns",
-      "N12 and n22 play on the same passes as 2 2 and 1 2",
       "The knob order is the agreed one"
      ]
     ],
