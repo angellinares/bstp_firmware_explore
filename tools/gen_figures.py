@@ -1,22 +1,27 @@
-"""Draw the figures of docs/step-chance-and-conditions.md as SVG files in docs/figures/.
+"""Draw the figures of the patch page's guide as SVG files in site/figures/.
 
     python tools/gen_figures.py
 
 The chance values and the conditions come from the tables in patches/trig.c, and
 which pass a condition plays on from the same rule as cond_met there, so the
-figures follow the firmware.
+figures follow the firmware. Their colours are the page's, light or dark as the
+viewer's system is.
 """
 import os
 import re
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-OUT = os.path.join(ROOT, "docs", "figures")
+OUT = os.path.join(ROOT, "site", "figures")
 SRC = open(os.path.join(ROOT, "patches", "trig.c"), encoding="utf-8").read()
 
 CHANCE = [int(v) for v in re.search(r"chance\[\] = \{([^}]*)\}", SRC).group(1).split(",")]
 RATIO = [tuple(map(int, p)) for p in re.findall(r"\{(\d), (\d)\}", re.search(r"ratio\[\]\[2\] = \{(.*?)\};", SRC, re.S).group(1))]
 
-INK, MUTED, LINE, ON, ACCENT, BG = "#1d2430", "#6b7380", "#c9ced6", "#2f6fdb", "#e0782f", "#ffffff"
+INK, MUTED, LINE, ON, ACCENT, BG = ("var(--%s)" % n for n in ("ink", "muted", "line", "on", "fill", "bg"))
+# The page's colours (site/index.html), so a figure sits on the mod's card in either theme.
+STYLE = ("<style>:root{--ink:#1c1c1a;--muted:#66655f;--line:#d5d3ca;--on:#256b3a;--fill:#b3401f;--bg:#fff}"
+         "@media (prefers-color-scheme:dark){:root{--ink:#ecebe6;--muted:#a3a199;--line:#3a3934;"
+         "--on:#7ec994;--fill:#f08a5d;--bg:#20201d}}</style>")
 FONT = "font-family='Helvetica, Arial, sans-serif'"
 MONO = "font-family='Consolas, Menlo, monospace'"
 
@@ -31,8 +36,18 @@ def conditions():
 
 
 def svg(name, width, height, body):
-    text = ("<svg xmlns='http://www.w3.org/2000/svg' width='%d' height='%d' viewBox='0 0 %d %d'>\n"
-            "<rect width='100%%' height='100%%' fill='%s'/>\n%s\n</svg>\n" % (width, height, width, height, BG, body))
+    text = ("<svg xmlns='http://www.w3.org/2000/svg' width='%d' height='%d' viewBox='0 0 %d %d'>\n%s\n"
+            "<rect width='100%%' height='100%%' fill='%s'/>\n%s\n</svg>\n" % (width, height, width, height, STYLE, BG, body))
+
+    # var() works in CSS, not in fill= and stroke= attributes: move those into one style= per element.
+    def styled(tag):
+        tag = tag.group(0)
+        props = re.findall(r" (fill|stroke)='(var\([^)]*\))'", tag)
+        if props:
+            tag = re.sub(r" (fill|stroke)='var\([^)]*\)'", "", tag)
+            tag = tag.replace(" ", " style='%s' " % ";".join("%s:%s" % p for p in props), 1)
+        return tag
+    text = re.sub(r"<[a-z]+ [^>]*>", styled, text)
     with open(os.path.join(OUT, name), "w", encoding="utf-8", newline="\n") as f:
         f.write(text)
 
@@ -46,7 +61,7 @@ def panel():
     """The gesture: hold a step, turn a knob, read the display."""
     p = []
     # display
-    p.append("<rect x='30' y='30' width='130' height='60' rx='6' fill='%s'/>" % INK)
+    p.append("<rect x='30' y='30' width='130' height='60' rx='6' fill='#111'/>")  # the unit's display, dark in both themes
     p.append(label(95, 74, "n12", 34, "#ff5a4a", "middle", MONO, "bold"))
     p.append(label(95, 112, "display", 12, MUTED, "middle"))
     # knobs
@@ -95,8 +110,10 @@ def condition_grid(passes=12):
     for n in range(passes):
         p.append(label(left + n * cell + cell / 2, top - 10, str(n + 1), 11, MUTED, "middle"))
     p.append(label(left - 8, top - 10, "pass", 11, MUTED, "end"))
+    twins = {"n12": "same as 2-2", "n22": "same as 1-2"}   # the knob steps over them since 1.3.2
     for r, (name, plays) in enumerate(rows):
         y = top + r * cell
+        p.append("<g opacity='%s'>" % (0.35 if name in twins else 1))
         if r in (1, 3, 7, 13):  # a new group: 1St and n1S, then B = 2, 3, 4
             p.append("<line x1='4' y1='%g' x2='%g' y2='%g' stroke='%s'/>" % (y - 2, left + passes * cell, y - 2, LINE))
         p.append(label(left - 10, y + 16, name, 13, INK, "end", MONO, "bold"))
@@ -104,12 +121,16 @@ def condition_grid(passes=12):
             on = plays(n + 1)
             p.append("<rect x='%d' y='%d' width='%d' height='%d' rx='3' fill='%s' stroke='%s'/>"
                      % (left + n * cell + 2, y + 2, cell - 4, cell - 4, ON if on else BG, ON if on else LINE))
+        p.append("</g>")
+        if name in twins:
+            p.append(label(left + passes * cell + 10, y + 11, "not in the firmware,", 11, INK))
+            p.append(label(left + passes * cell + 10, y + 24, twins[name], 11, MUTED))
     y = top + len(rows) * cell + 22
     p.append("<rect x='%d' y='%d' width='16' height='16' rx='3' fill='%s'/>" % (left, y - 12, ON))
     p.append(label(left + 22, y + 1, "the step plays", 12, INK))
     p.append("<rect x='%d' y='%d' width='16' height='16' rx='3' fill='%s' stroke='%s'/>" % (left + 150, y - 12, BG, LINE))
     p.append(label(left + 172, y + 1, "the step is silent", 12, INK))
-    svg("conditions.svg", left + passes * cell + 20, y + 16, "\n".join(p))
+    svg("conditions.svg", left + passes * cell + 130, y + 16, "\n".join(p))
 
 
 def fill_example():

@@ -21,10 +21,11 @@ SHOW_GLYPHS = 0x08023BA2
 DISPLAY = 0x20009000
 
 RATIOS = [(1, 2), (2, 2), (1, 3), (2, 3), (3, 3), (1, 4), (2, 4), (3, 4), (4, 4)]
-# What the Probability knob walks through, left to right, as the display shows it.
+# Every condition, as the display shows it, in code order.
 SHOWN = ["1-1", "1St", "n1S"] + [text for a, b in RATIOS for text in ("%d-%d" % (a, b), "n%d%d" % (a, b))]
 GLYPH = {"-": 0x20, "n": 0x25, "S": 0x1C, "t": 0x1B, **{str(d): d for d in range(10)}}
 FIRST = 22               # the code of condition 1; codes 1..21 are chances
+SKIPPED = (4, 6)         # n12 and n22: the knob steps over them, as they play like 2-2 and 1-2
 
 
 def plays(k, passes):
@@ -130,11 +131,14 @@ def test_the_knob_walks_the_conditions_and_stops_at_both_ends(fw):
     for _ in range(25):
         fw.call(SYM["ui_cond_set"], SEQ, 0, get() + 1)
         seen.append(get())
-    assert seen == list(range(21)) + [20] * 5
+    assert seen == [k for k in range(21) if k not in SKIPPED] + [20] * 7
     assert fw.read(on_addr(0, 9), 1)[0] == 1 | 41 << 1
+    seen = []
     for _ in range(20):
-        fw.call(SYM["ui_cond_set"], SEQ, 0, get() - 1)
-    assert get() == 0 and fw.read(on_addr(0, 9), 1) == b"\1"
+        fw.call(SYM["ui_cond_set"], SEQ, 0, max(get() - 1, 0))   # the handler keeps the value in range
+        seen.append(get())
+    assert not set(seen) & set(SKIPPED), seen
+    assert get() == 0 and fw.read(on_addr(0, 9), 1) == b"\1", seen
     assert fw.read(SEQ + PROBABILITY, 1) == b"\0", "the track's own Probability is untouched"
     assert fw.read(SEQ + DIRTY, 1) == b"\1" and fw.read(HOLD_USED, 1) == b"\1"
 
@@ -143,8 +147,8 @@ def test_a_step_has_a_chance_or_a_condition(fw):
     hold(fw, 1, 3)
     fw.call(SYM["ui_chance_set"], SEQ, 1, 50)
     assert fw.call(SYM["ui_chance_get"], SEQ, 1) == 50
-    fw.call(SYM["ui_cond_set"], SEQ, 1, 4)
-    assert fw.call(SYM["ui_cond_get"], SEQ, 1) == 4
+    fw.call(SYM["ui_cond_set"], SEQ, 1, 3)
+    assert fw.call(SYM["ui_cond_get"], SEQ, 1) == 3
     assert fw.call(SYM["ui_chance_get"], SEQ, 1) == 100, "the chance is gone"
     fw.call(SYM["ui_chance_set"], SEQ, 1, 99)
     assert fw.call(SYM["ui_cond_get"], SEQ, 1) == 0, "and the condition goes when a chance is set"
@@ -161,8 +165,7 @@ def test_a_held_step_that_is_off_gets_no_condition(fw):
 
 @pytest.mark.parametrize("k", range(21))
 def test_the_display_shows_the_condition(fw, k):
-    hold(fw, 0, 9)
-    fw.call(SYM["ui_cond_set"], SEQ, 0, k)
+    hold(fw, 0, 9, on=1 | (FIRST + k - 1) << 1 if k else 1)   # as saved, n12 and n22 included
     shown = fw.call(SYM["ui_cond_shown"], SEQ, 0)
     value = shown - 0x100 if shown & 0x80 else shown     # the caller sign-extends the byte
     assert value < 0
@@ -179,6 +182,20 @@ def test_other_values_go_to_the_stock_number_display(fw, value):
     glyphs = fw.spy(SHOW_GLYPHS, count=5)
     fw.call(SYM["show_value"], DISPLAY, 4, value)
     assert numbers == [[DISPLAY, 4, value]] and glyphs == []
+
+
+@pytest.mark.parametrize("k, right, left", [(4, 5, 3), (6, 7, 5)])
+def test_a_step_saved_with_n12_or_n22_keeps_it_until_the_knob_turns(fw, k, right, left):
+    for to, want in ((1, right), (-1, left)):
+        hold(fw, 0, 9, on=1 | (FIRST + k - 1) << 1)
+        assert fw.call(SYM["ui_cond_get"], SEQ, 0) == k
+        fw.call(SYM["ui_cond_set"], SEQ, 0, k + to)
+        assert fw.call(SYM["ui_cond_get"], SEQ, 0) == want
+
+
+def test_n12_and_n22_play_on_the_same_passes_as_2_2_and_1_2():
+    for twin, same in ((4, 5), (6, 3)):
+        assert [plays(twin, n) for n in range(12)] == [plays(same, n) for n in range(12)]
 
 
 def test_the_knob_order_is_the_agreed_one():
