@@ -92,8 +92,6 @@ static const u8 chance[] = {1, 2, 4, 6, 9, 13, 19, 25, 33, 41, 50,
 static const u8 ratio[][2] = {{1, 2}, {2, 2}, {1, 3}, {2, 3}, {3, 3},
                               {1, 4}, {2, 4}, {3, 4}, {4, 4}};
 #define CONDS (2 + 2 * (u32)(sizeof ratio / sizeof *ratio))
-#define N12   4   /* the conditions the knob steps over (see ui_cond_set) */
-#define N22   6
 
 /* -> the condition of an on byte, 1..CONDS, or 0 when it has none. */
 static u32 cond_of(u32 on)
@@ -501,10 +499,6 @@ void ui_cond_set(struct seq *seq, int track, u32 value)
     }
     if (value > CONDS)
         value = CONDS;
-    /* n12 and n22 play on the same passes as 2-2 and 1-2: the knob steps over
-     * them. A step saved with one keeps it and plays as before. */
-    if (value == N12 || value == N22)
-        value += value > ui_cond_get(seq, track) ? 1 : -1;
     set_code(seq, on, value ? CODES + value : 0);
 }
 
