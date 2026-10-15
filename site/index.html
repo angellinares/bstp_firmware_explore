@@ -36,13 +36,7 @@
   code { font-size: .85em; word-break: break-all; }
   a:not(.button) { color: var(--accent); }
   .warn + .warn { margin-top: 8px; }
-  details h3 { font-size: .95rem; margin: 16px 0 4px; }
-  ol { margin: 4px 0; padding-left: 24px; }
-  img.figure { display: block; max-width: 100%; height: auto; margin: 10px 0; border: 1px solid var(--line); border-radius: 6px; }
-  .table { overflow-x: auto; }
-  table { border-collapse: collapse; font-size: .9rem; margin: 8px 0; }
-  th, td { text-align: left; padding: 3px 12px 3px 0; border-bottom: 1px solid var(--line); vertical-align: top; }
-  td:first-child { font-family: ui-monospace, Consolas, monospace; white-space: nowrap; }
+  details h3 { font-size: .95rem; margin: 12px 0 2px; }
   dialog { max-width: 460px; border: 1px solid var(--line); border-radius: 8px; padding: 20px;
            background: var(--card); color: var(--fg); }
   dialog::backdrop { background: rgba(0, 0, 0, .55); }
@@ -114,25 +108,7 @@
     };
     const guide = document.createElement("details");
     guide.append(Object.assign(document.createElement("summary"), { textContent: "How to use it" }));
-    // A guide block: text is a paragraph; {list}, {steps}, {figure, alt} or {table: [header, ...rows]}.
-    const block = (b) => {
-      const el = (tag, props) => Object.assign(document.createElement(tag), props);
-      if (typeof b === "string") return el("p", { textContent: b });
-      if (b.list || b.steps) {
-        const l = el(b.steps ? "ol" : "ul");
-        l.append(...(b.list || b.steps).map(item));
-        return l;
-      }
-      if (b.figure) return el("img", { src: "figures/" + b.figure, alt: b.alt, className: "figure", loading: "lazy" });
-      const wrap = el("div", { className: "table" }), table = el("table");
-      for (const [n, row] of b.table.entries()) {
-        const tr = table.insertRow();
-        for (const cell of row) tr.append(el(n ? "td" : "th", { textContent: cell }));
-      }
-      wrap.append(table);
-      return wrap;
-    };
-    for (const [title, blocks] of mod.guide) guide.append(Object.assign(document.createElement("h3"), { textContent: title }), ...blocks.map(block));
+    for (const [title, items] of mod.guide) section(guide, title, items);
     guide.hidden = !mod.guide.length;
     const log = document.createElement("details");
     log.append(Object.assign(document.createElement("summary"), { textContent: "Changelog" }));
