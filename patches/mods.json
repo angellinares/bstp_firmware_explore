@@ -69,6 +69,7 @@
   ],
   "summary": "Each SEQ1, SEQ2 and DRUM step can have a chance to play (hold the step, turn Randomness) or a condition such as every second pass (hold the step, turn Probability).",
   "changes": [
+   ["1.3.2", "2026-10-16", "The Probability knob steps over n12 and n22. They play on the same passes as 2-2 and 1-2. A step saved with n12 or n22 keeps it and plays as before."],
    ["1.3.1", "2026-10-13", "Recording: a hit recorded over a rolled step now always removes its ratchet. 1.3.0 followed only the roller's own hits, one of the ten places a recorded hit comes from; it was never installed on a device."],
    ["1.3.0", "2026-10-13", "Ratchets on DRUM steps: a step can play 2, 4 or 8 times inside its own length. Hold a step and touch the roller strip at a rate finer than the track to set it, at the track's rate or coarser to clear it; recording a finer roll sets it too. Ratcheted steps light cyan. Up to 96 per drum pattern, saved with it."],
    ["1.2.1", "2026-10-13", "Chance and conditions on DRUM steps too, set on the selected pad's steps and saved with the drum pattern. Each pad counts the passes of its own length. Copy project carries them."],
@@ -86,6 +87,7 @@
   "hardware": "not run on a device yet",
   "summary": "Up to four notes on a SEQ1 or SEQ2 step. Includes step chance and conditions. Chords are saved in a part of the storage chip the stock firmware does not use.",
   "changes": [
+   ["1.3.2", "2026-10-16", "Step chance and conditions 1.3.2: the Probability knob steps over n12 and n22."],
    ["1.3.1", "2026-10-13", "Step chance and conditions 1.3.1."],
    ["1.3.0", "2026-10-13", "Step chance and conditions 1.3.0: ratchets on DRUM steps."],
    ["1.2.1", "2026-10-13", "Step chance and conditions 1.2.1: also on DRUM steps."],
