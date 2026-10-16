@@ -731,3 +731,17 @@ def test_a_strip_touch_without_a_held_step_leaves_the_display(drum):
     drum.write(CUR_TRACK, struct.pack("<i", 2))
     drum.call(SYM["strip_set"], SEQ, 8, 1)
     assert struct.unpack("<I", drum.read(SHOWN_KNOB, 4))[0] == 0x12
+
+
+KNOB_TOUCH = 0x0801F6D8
+
+
+@pytest.mark.parametrize("knob, on, kept", [(0x11, COND_ON, 1), (0x12, CHANCE_ON, 1), (0x13, 0x81, 1),
+                                            (0x12, 1, 0), (0x10, COND_ON, 0)])
+def test_touching_a_knob_keeps_a_held_step_with_settings(drum, knob, on, kept):
+    touched, _ = drum.spy(KNOB_TOUCH, count=3), drum.spy(BUTTON_FLAG, count=3)
+    drum.write(HOLD_USED, [0, 0, 0])
+    hold(drum, 6, 21, on)
+    drum.call(SYM["ui_knob_touch"], 0x2000B000, knob, 1)
+    assert touched == [[0x2000B000, knob, 1]]
+    assert drum.read(HOLD_USED + 2, 1)[0] == kept

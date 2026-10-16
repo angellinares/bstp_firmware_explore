@@ -173,6 +173,7 @@ u32 fw_step_map(struct seq *seq, int track, u32 step, int pad);
 void fw_led(void *leds, int index, int colour);
 void fw_strip_set(struct seq *seq, u32 zone, int send);
 void fw_encoders_poll(u32 *shown);
+void fw_knob_touch(void *buttons, int knob, int on);
 void fw_knob_show(void *buttons, int knob, int on);
 u32 fw_swing_get(struct seq *seq, int track);
 void fw_swing_set(struct seq *seq, int track, u32 value);
@@ -439,18 +440,33 @@ static void touched(struct seq *seq)
     keep_held();
 }
 
-/* Replaces the call that shows a knob's value in the Swing, Randomness and
- * Probability handlers (six sites), which comes before the setter and also
- * when the value is at its end and the setter is not called. A held step
- * with a chance, a condition or a ratchet whose value is only looked at stays
- * on when it is let go. A plain step still goes off, as stock. */
-void ui_knob_show(void *buttons, int knob, int on)
+/* A held step with a chance, a condition or a ratchet whose value is only
+ * looked at stays on when it is let go. A plain step still goes off, as stock. */
+static void looked_at(void)
 {
     u8 *step = held(SEQ);
 
     if (step && *step & ~1u)
         keep_held();
+}
+
+/* Replaces the call that shows a knob's value in the Swing, Randomness and
+ * Probability handlers (six sites), which comes before the setter and also
+ * when the value is at its end and the setter is not called. */
+void ui_knob_show(void *buttons, int knob, int on)
+{
+    looked_at();
     fw_knob_show(buttons, knob, on);
+}
+
+/* Replaces the call that notes a touch of Tempo, Swing, Randomness or
+ * Probability (0x0802D224): the knobs sense touch, and a touch alone shows
+ * the value. It comes on every scan while the knob is touched. */
+void ui_knob_touch(void *buttons, int knob, int on)
+{
+    if (knob >= 0x11 && knob <= 0x13)
+        looked_at();
+    fw_knob_touch(buttons, knob, on);
 }
 
 static void set_code(struct seq *seq, u8 *on, u32 code)
