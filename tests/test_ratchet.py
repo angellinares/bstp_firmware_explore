@@ -700,3 +700,34 @@ def test_showing_a_knob_keeps_a_held_step_with_settings(drum, on, kept):
     assert shown == [[0x2000B000, 0x12, 1]]
     assert drum.read(HOLD_USED + 2, 1)[0] == kept
     assert drum.read(SEQ + DRUM_DIRTY, 1)[0] == 0           # looking does not ask for a save
+
+
+# The display after a strip touch
+
+SHOWN_KNOB = 0x2000B100   # stands in for the main loop's variable
+ENCODERS_POLL = 0x0802BEE4
+KNOB_WAKE = 0x20000046
+
+
+def test_a_strip_touch_on_a_held_step_puts_swing_on_the_display(drum):
+    polled = drum.spy(ENCODERS_POLL, count=1)
+    drum.call(SYM["knobs_poll"], SHOWN_KNOB)
+    assert polled == [[SHOWN_KNOB]]
+    drum.write(SHOWN_KNOB, struct.pack("<I", 0x12))       # Randomness was turned last
+    drum.write(KNOB_WAKE, [0, 0, 0])
+    strip(drum)
+    drum.spy(BUTTON_FLAG)
+    hold(drum, 6, 21)
+    drum.call(SYM["strip_set"], SEQ, 8, 1)
+    assert struct.unpack("<I", drum.read(SHOWN_KNOB, 4))[0] == 0x11
+    assert drum.read(KNOB_WAKE, 1)[0] == 3
+
+
+def test_a_strip_touch_without_a_held_step_leaves_the_display(drum):
+    drum.spy(ENCODERS_POLL, count=1)
+    drum.call(SYM["knobs_poll"], SHOWN_KNOB)
+    drum.write(SHOWN_KNOB, struct.pack("<I", 0x12))
+    strip(drum)
+    drum.write(CUR_TRACK, struct.pack("<i", 2))
+    drum.call(SYM["strip_set"], SEQ, 8, 1)
+    assert struct.unpack("<I", drum.read(SHOWN_KNOB, 4))[0] == 0x12
