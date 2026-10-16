@@ -7,6 +7,7 @@
  * Firmware addresses carry the Thumb bit, or the linker emits BLX.
  */
 fw_step_on       = 0x080113df;  /* (seq, track, step, pad) -> the on byte of a step */
+fw_step_on_set   = 0x080115b9;  /* (seq, track, on, step, pad): writes 0 or 1 */
 fw_rng_next      = 0x0801d1d9;  /* (seq): advance the LCG at seq+4 */
 fw_rand_get      = 0x080113b1;  /* (seq, track or -1) -> Randomness knob value */
 fw_rand_set      = 0x08011577;  /* (seq, track or -1, value) */

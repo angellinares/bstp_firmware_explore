@@ -37,6 +37,7 @@
 #include "fw.h"
 
 u32 fw_step_on(struct seq *seq, int track, int step, int pad);
+void fw_step_on_set(struct seq *seq, int track, u32 on, int step, int pad);
 u32 fw_rand_get(struct seq *seq, int track);
 void fw_rand_set(struct seq *seq, int track, u32 value);
 void fw_prob_set(struct seq *seq, int track, u32 value);
@@ -696,6 +697,22 @@ void rec_off(int track, int pad, int tie)
     ready();
     if (r->count >= 2 && r->step < STEPS && ((u8 *)SEQ)[DRUM_ON + pad * 0x40 + r->step])
         set_ratchet(SEQ, pad, r->step, r->code);
+}
+
+/* Replaces the setter where a press of a step button switches the step on
+ * (0x08018B02). The press comes before the release decides whether to turn
+ * it off, so it also hits a step that is already on: that step keeps its
+ * chance or condition and its ratchet. The stock setter still runs, for the
+ * drum step count it keeps. */
+void press_on(struct seq *seq, int track, u32 on, int step, int pad)
+{
+    u8 *at = (u32)step >= STEPS ? 0 : track == 2 ? ((u32)pad < PADS ? (u8 *)seq + DRUM_ON + pad * 0x40 + step : 0)
+             : (u32)track < 2 ? step_on(seq, track) + step : 0;
+    u32 was = at ? *at : 0;
+
+    fw_step_on_set(seq, track, on, step, pad);
+    if (on && was)
+        *at = was;
 }
 
 /* Display glyphs: 0..9 are the digits. */

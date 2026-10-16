@@ -656,3 +656,34 @@ def test_a_held_step_does_not_blink(drum):
     hold(drum, 6, 21, CHANCE_ON)
     assert light(drum, CHANCE_ON, 7 * 128) == 5
     assert light(drum, CHANCE_ON, 7 * 128, step=22) == 8
+
+
+# Pressing a step that is on
+
+STEP_ON_SET = 0x080115B8
+DRUM_COUNT = 0x2456       # seq + this + pad: steps on, kept by the stock setter
+
+
+@pytest.mark.parametrize("was", [CHANCE_ON | 0x80, COND_ON, 0x81, 1])
+def test_pressing_a_step_that_is_on_keeps_it(drum, was):
+    drum.write(on_addr(6, 21), [was])
+    drum.write(on_addr(6, 22), [1])
+    drum.write(SEQ + DRUM_COUNT + 6, [10])
+    drum.call(SYM["press_on"], SEQ, 2, 1, 21, 6)
+    assert drum.read(on_addr(6, 21), 1)[0] == was
+    drum.call(STEP_ON_SET, SEQ, 2, 1, 22, 6)                   # the stock setter, for its count
+    count = drum.read(SEQ + DRUM_COUNT + 6, 1)[0]
+    assert count == 12
+
+
+def test_pressing_a_melodic_step_that_is_on_keeps_it(drum):
+    addr = SEQ + 0x230 + 0x8B7 + 5
+    drum.write(addr, [COND_ON])
+    drum.call(SYM["press_on"], SEQ, 1, 1, 5, -1)
+    assert drum.read(addr, 1)[0] == COND_ON
+
+
+def test_pressing_a_step_that_is_off_switches_it_plainly_on(drum):
+    drum.write(on_addr(6, 21), [0])
+    drum.call(SYM["press_on"], SEQ, 2, 1, 21, 6)
+    assert drum.read(on_addr(6, 21), 1)[0] == 1

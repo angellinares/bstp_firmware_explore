@@ -73,6 +73,7 @@
   ],
   "summary": "Each SEQ1, SEQ2 and DRUM step can have a chance to play (hold the step, turn Randomness) or a condition such as every second pass (hold the step, turn Probability).",
   "changes": [
+   ["1.4.3", "2026-10-16", "A press on a step that is on no longer removes its chance, condition or ratchet. Before, each new press of the step reset it to plainly on."],
    ["1.4.2", "2026-10-16", "A step with a condition blinks off two times in quick succession every two seconds, in place of the long dark gap of 1.4.1. A step with a chance still blinks off one time each second."],
    ["1.4.1", "2026-10-16", "The step lights blink at half the speed of 1.4.0: a chance blinks off one time each second, a condition goes off for half a second in every two seconds."],
    ["1.4.0", "2026-10-16", "Step lights: a step with a chance blinks off two times each second, a step with a condition goes off for a quarter of each second. A ratcheted step blinks in cyan. A held step does not blink."],
@@ -94,6 +95,7 @@
   "hardware": "not run on a device yet",
   "summary": "Up to four notes on a SEQ1 or SEQ2 step. Includes step chance and conditions. Chords are saved in a part of the storage chip the stock firmware does not use.",
   "changes": [
+   ["1.4.3", "2026-10-16", "Step chance and conditions 1.4.3: a new press of a step keeps its chance, condition and ratchet."],
    ["1.4.2", "2026-10-16", "Step chance and conditions 1.4.2: a step with a condition double-blinks."],
    ["1.4.1", "2026-10-16", "Step chance and conditions 1.4.1: the step lights blink at half the speed."],
    ["1.4.0", "2026-10-16", "Step chance and conditions 1.4.0: steps with a chance or a condition blink."],
