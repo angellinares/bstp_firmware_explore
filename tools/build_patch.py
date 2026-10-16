@@ -61,6 +61,8 @@ TRIG = [
     (0x0801691A, 0x08027DBC, "drum_merge"),
     (0x0800692C, 0x08012728, "drum_events"),
     (0x08018B02, 0x080115B8, "press_on"),
+] + [(site, 0x0801FAC4, "ui_knob_show") for site in (0x0802C0E0, 0x0802C168, 0x0802C1EA, 0x0802C380, 0x0802C402, 0x0802C484)
+] + [
     (0x08008A1A, 0x080113DE, "led_step_on"),
     (0x08008B5A, 0x080113DE, "led_step_on"),
     (0x0802C0D2, 0x080159BA, "ui_swing_get"),

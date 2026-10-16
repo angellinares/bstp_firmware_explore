@@ -687,3 +687,16 @@ def test_pressing_a_step_that_is_off_switches_it_plainly_on(drum):
     drum.write(on_addr(6, 21), [0])
     drum.call(SYM["press_on"], SEQ, 2, 1, 21, 6)
     assert drum.read(on_addr(6, 21), 1)[0] == 1
+
+
+# Looking at a held step's value
+
+@pytest.mark.parametrize("on, kept", [(CHANCE_ON, 1), (COND_ON, 1), (0x81, 1), (1, 0)])
+def test_showing_a_knob_keeps_a_held_step_with_settings(drum, on, kept):
+    shown, flags = drum.spy(KNOB_SHOW, count=3), drum.spy(BUTTON_FLAG, count=3)
+    drum.write(HOLD_USED, [0, 0, 0])
+    hold(drum, 6, 21, on)
+    drum.call(SYM["ui_knob_show"], 0x2000B000, 0x12, 1)
+    assert shown == [[0x2000B000, 0x12, 1]]
+    assert drum.read(HOLD_USED + 2, 1)[0] == kept
+    assert drum.read(SEQ + DRUM_DIRTY, 1)[0] == 0           # looking does not ask for a save

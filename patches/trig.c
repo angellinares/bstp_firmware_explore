@@ -420,14 +420,34 @@ static u8 *held(struct seq *seq)
     return step_on(seq, track) + HELD_STEP[track];
 }
 
-/* The held step was changed: the pattern needs saving, and letting go of the
- * step must leave it on, as after the stock hold-a-step-and-press-a-pad. */
-static void touched(struct seq *seq)
+/* Letting go of the held step must leave it on, as after the stock
+ * hold-a-step-and-press-a-pad. */
+static void keep_held(void)
 {
-    ((u8 *)seq)[DIRTY + CUR_TRACK] = 1;
     HOLD_USED[CUR_TRACK] = 1;
     if (HELD_PAD[CUR_TRACK] >= 0)
         fw_button_flag(BUTTONS, HELD_PAD[CUR_TRACK] + STEP_BUTTON, 0);
+}
+
+/* The held step was changed: the pattern needs saving, and the step stays on. */
+static void touched(struct seq *seq)
+{
+    ((u8 *)seq)[DIRTY + CUR_TRACK] = 1;
+    keep_held();
+}
+
+/* Replaces the call that shows a knob's value in the Swing, Randomness and
+ * Probability handlers (six sites), which comes before the setter and also
+ * when the value is at its end and the setter is not called. A held step
+ * with a chance, a condition or a ratchet whose value is only looked at stays
+ * on when it is let go. A plain step still goes off, as stock. */
+void ui_knob_show(void *buttons, int knob, int on)
+{
+    u8 *step = held(SEQ);
+
+    if (step && *step & ~1u)
+        keep_held();
+    fw_knob_show(buttons, knob, on);
 }
 
 static void set_code(struct seq *seq, u8 *on, u32 code)
@@ -593,9 +613,7 @@ void ui_swing_set(struct seq *seq, int track, u32 value)
 {
     if (drum_held(seq)) {
         MISC->full = 0;
-        HOLD_USED[2] = 1;
-        if (HELD_PAD[2] >= 0)
-            fw_button_flag(BUTTONS, HELD_PAD[2] + STEP_BUTTON, 0);
+        keep_held();
     } else {
         fw_swing_set(seq, track, value);
     }
