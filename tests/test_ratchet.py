@@ -308,7 +308,9 @@ def test_another_step_of_the_pad_is_not_taken_for_a_hit(drum):
 # Panel
 
 def strip(fw):
-    return fw.spy(STRIP_SET, count=3), fw.spy(KNOB_SHOW, count=3)
+    """Spy the roller's setter and the knob touch -> both call lists."""
+    fw.write(0x200002AC, struct.pack("<I", 0x2000B100))   # where the main loop keeps the knob shown
+    return fw.spy(STRIP_SET, count=3), fw.spy(0x0801F6D8, count=3)
 
 
 def test_the_strip_sets_the_held_steps_ratchet(drum):
@@ -318,7 +320,7 @@ def test_the_strip_sets_the_held_steps_ratchet(drum):
     drum.call(SYM["strip_set"], SEQ, 8, 1)                # 1/32 on a 1/16 track
     assert drum.read(on_addr(6, 21), 1)[0] == 0x81 and drum.read(RATE + 6 * 0x40 + 21, 1)[0] == 1
     assert passed == [[SEQ, 0, 1]], "the roller does not hear of the touch"
-    assert shown == [[0, 0x11, 1]], "the display is asked for the Swing knob's value"
+    assert shown == [[0, 0x11, 1]], "the strip touch acts as a touch of Swing, whose value is the ratchet"
     assert drum.read(SEQ + DRUM_DIRTY, 1) == b"\1" and drum.read(HOLD_USED + 2, 1) == b"\1"
     assert drum.call(SYM["ui_swing_shown"], SEQ, 2) & 0xFF == 0xC1
 
@@ -606,3 +608,141 @@ def test_copy_project_takes_the_ratchets_along(drum):
     ratchet_pattern(drum, {})
     stock_reload(drum, chip, base=OTHER)
     assert stored(drum) == RATCHETS
+
+
+@pytest.mark.parametrize("knob, value", [("ui_chance_set", 50), ("ui_cond_set", 3)])
+def test_a_ratcheted_step_stays_cyan_with_a_chance_or_condition(drum, knob, value):
+    drum.spy(BUTTON_FLAG, count=3)
+    lit = drum.spy(LED, count=3)
+    hold(drum, 6, 21, 0x81)
+    drum.write(RATE + 6 * 0x40 + 21, [2])
+    drum.call(SYM[knob], SEQ, 2, value)
+    assert drum.read(on_addr(6, 21), 1)[0] & 0x80
+    drum.call(SYM["led_step_on"], SEQ, 2, 21, 6)
+    drum.call(SYM["led_colour"], 0x2000A000, 5, 5)
+    assert [call[1:] for call in lit] == [[5, 4]]
+
+
+# Blinking lights
+
+MS = 0x20000574
+CHANCE_ON = 1 | 10 << 1                                   # chance code 10: 41 percent
+COND_ON = 1 | (21 + 3) << 1                               # condition 1-2
+
+
+def light(fw, on, ms, track=2, step=21, pad=6):
+    """Paint one step at SysTick count ms -> the colour it got (5 is the track's)."""
+    lit = fw.spy(LED, count=3)
+    fw.write(on_addr(pad, step) if track == 2 else SEQ + track * 0x230 + 0x8B7 + step, [on])
+    fw.write(MS, struct.pack("<I", ms))
+    fw.spy(STEP_ON, result=on)
+    fw.call(SYM["led_step_on"], SEQ, track, step, pad)
+    fw.call(SYM["led_colour"], 0x2000A000, step & 15, 5)
+    return lit[0][2]
+
+
+@pytest.mark.parametrize("on, dark", [(CHANCE_ON, {7, 15}), (COND_ON, {12, 14}),
+                                      (CHANCE_ON | 0x80, {7, 15}), (1, set()), (0x81, set())])
+def test_a_step_with_a_chance_or_condition_blinks(drum, on, dark):
+    drum.write(RATE + 6 * 0x40 + 21, [2])
+    colour = 4 if on & 0x80 else 5
+    assert [light(drum, on, slot * 128 + 5) for slot in range(16)] == [8 if s in dark else colour for s in range(16)]
+
+
+def test_melodic_steps_blink_too(drum):
+    assert light(drum, COND_ON, 12 * 128, track=0) == 8
+    assert light(drum, COND_ON, 0, track=0) == 5
+
+
+def test_a_held_step_does_not_blink(drum):
+    hold(drum, 6, 21, CHANCE_ON)
+    assert light(drum, CHANCE_ON, 7 * 128) == 5
+    assert light(drum, CHANCE_ON, 7 * 128, step=22) == 8
+
+
+# Pressing a step that is on
+
+STEP_ON_SET = 0x080115B8
+DRUM_COUNT = 0x2456       # seq + this + pad: steps on, kept by the stock setter
+
+
+@pytest.mark.parametrize("was", [CHANCE_ON | 0x80, COND_ON, 0x81, 1])
+def test_pressing_a_step_that_is_on_keeps_it(drum, was):
+    drum.write(on_addr(6, 21), [was])
+    drum.write(on_addr(6, 22), [1])
+    drum.write(SEQ + DRUM_COUNT + 6, [10])
+    drum.call(SYM["press_on"], SEQ, 2, 1, 21, 6)
+    assert drum.read(on_addr(6, 21), 1)[0] == was
+    drum.call(STEP_ON_SET, SEQ, 2, 1, 22, 6)                   # the stock setter, for its count
+    count = drum.read(SEQ + DRUM_COUNT + 6, 1)[0]
+    assert count == 12
+
+
+def test_pressing_a_melodic_step_that_is_on_keeps_it(drum):
+    addr = SEQ + 0x230 + 0x8B7 + 5
+    drum.write(addr, [COND_ON])
+    drum.call(SYM["press_on"], SEQ, 1, 1, 5, -1)
+    assert drum.read(addr, 1)[0] == COND_ON
+
+
+def test_pressing_a_step_that_is_off_switches_it_plainly_on(drum):
+    drum.write(on_addr(6, 21), [0])
+    drum.call(SYM["press_on"], SEQ, 2, 1, 21, 6)
+    assert drum.read(on_addr(6, 21), 1)[0] == 1
+
+
+# Looking at a held step's value
+
+@pytest.mark.parametrize("on, kept", [(CHANCE_ON, 1), (COND_ON, 1), (0x81, 1), (1, 0)])
+def test_showing_a_knob_keeps_a_held_step_with_settings(drum, on, kept):
+    shown, flags = drum.spy(KNOB_SHOW, count=3), drum.spy(BUTTON_FLAG, count=3)
+    drum.write(HOLD_USED, [0, 0, 0])
+    hold(drum, 6, 21, on)
+    drum.call(SYM["ui_knob_show"], 0x2000B000, 0x12, 1)
+    assert shown == [[0x2000B000, 0x12, 1]]
+    assert drum.read(HOLD_USED + 2, 1)[0] == kept
+    assert drum.read(SEQ + DRUM_DIRTY, 1)[0] == 0           # looking does not ask for a save
+
+
+# The display after a strip touch
+
+SHOWN_PTR = 0x200002AC
+SHOWN_KNOB = 0x2000B100   # stands in for the main loop's variable
+TOUCH_HOLD = 0x200000F0
+
+
+def test_a_strip_touch_on_a_held_step_acts_as_a_touch_of_swing(drum):
+    drum.write(SHOWN_PTR, struct.pack("<I", SHOWN_KNOB))
+    drum.write(SHOWN_KNOB, struct.pack("<I", 0x12))       # Randomness was touched last
+    drum.write(TOUCH_HOLD, [0, 0])
+    _, touched = strip(drum)
+    drum.write(SHOWN_KNOB, struct.pack("<I", 0x12))
+    drum.spy(BUTTON_FLAG)
+    hold(drum, 6, 21)
+    drum.call(SYM["strip_set"], SEQ, 8, 1)
+    assert struct.unpack("<I", drum.read(SHOWN_KNOB, 4))[0] == 0x11
+    assert touched == [[0, 0x11, 1]]
+    assert struct.unpack("<H", drum.read(TOUCH_HOLD, 2))[0] == 150
+
+
+def test_a_strip_touch_without_a_held_step_leaves_the_display(drum):
+    drum.write(SHOWN_PTR, struct.pack("<I", SHOWN_KNOB))
+    drum.write(SHOWN_KNOB, struct.pack("<I", 0x12))
+    strip(drum)
+    drum.write(CUR_TRACK, struct.pack("<i", 2))
+    drum.call(SYM["strip_set"], SEQ, 8, 1)
+    assert struct.unpack("<I", drum.read(SHOWN_KNOB, 4))[0] == 0x12
+
+
+KNOB_TOUCH = 0x0801F6D8
+
+
+@pytest.mark.parametrize("knob, on, kept", [(0x11, COND_ON, 1), (0x12, CHANCE_ON, 1), (0x13, 0x81, 1),
+                                            (0x12, 1, 0), (0x10, COND_ON, 0)])
+def test_touching_a_knob_keeps_a_held_step_with_settings(drum, knob, on, kept):
+    touched, _ = drum.spy(KNOB_TOUCH, count=3), drum.spy(BUTTON_FLAG, count=3)
+    drum.write(HOLD_USED, [0, 0, 0])
+    hold(drum, 6, 21, on)
+    drum.call(SYM["ui_knob_touch"], 0x2000B000, knob, 1)
+    assert touched == [[0x2000B000, knob, 1]]
+    assert drum.read(HOLD_USED + 2, 1)[0] == kept
