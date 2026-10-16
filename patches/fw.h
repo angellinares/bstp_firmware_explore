@@ -14,6 +14,7 @@ struct seq {
 #define SEQ        (*(struct seq **)0x20000278)
 #define SAVE_TRACK (*(volatile s8 *)0x20000023)   /* the track whose record is being built */
 #define LOADED     ((const u8 *)0x20000B56 + 4)   /* what the last storage read returned */
+#define MS         (*(volatile u32 *)0x20000574)   /* SysTick count, 1 kHz */
 
 #define DIRTY      0x2450 /* seq + this + track: pattern needs saving */
 #define STEPS      64
@@ -23,3 +24,4 @@ u32 fw_storage_write(void *storage, u32 address, u8 *data, u32 length);
 
 void poly_save(void *storage, u32 address, u8 *rec);
 void poly_load(void *storage, int track);
+void poly_rec_on(int track, u32 note, u32 velocity, int pad);

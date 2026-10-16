@@ -9,13 +9,17 @@
  * note as before and clears its chord; each further pad while the step is
  * still held adds a note.
  *
+ * Recording: pads pressed within CHORD_MS of the first one, while it is still
+ * held, are recorded as its chord. The chord ends when the last of its pads
+ * is let go. A note recorded alone over a chord step clears the chord.
+ *
  * Storage: two pages per pattern in the part of the storage chip the stock
  * firmware never addresses (0x140000 up), tied to the pattern record by a
  * random tag so that a record copied or restored without its pages plays
  * without a chord instead of with someone else's.
  *
- * Limits: real-time recording, step shift and step copy do not carry the
- * extra notes; MIDI Control Center does not see them.
+ * Limits: step copy does not carry the extra notes; MIDI Control Center does
+ * not see them.
  */
 #include "fw.h"
 
@@ -38,6 +42,9 @@ struct poly {
     u16 tag[2];              /* tag of the pages that hold these notes; 0: none */
     u32 hold_time[2];
     u32 home[2];             /* address of those pages */
+    struct note rec[2][EXTRA];  /* the chord of the note being recorded */
+    u8 rec_count[2];
+    u32 rec_time[2];         /* MS when that note was pressed */
 };
 #define P ((struct poly *)0x20006000)
 
@@ -51,6 +58,10 @@ struct poly {
 #define PAGE_SIZE   (2 + PAGE_STEPS * EXTRA * 2)
 #define REC_TAG     0x3D       /* in the pattern record: tag, then a check byte */
 #define TAG_CHECK   0xA7
+
+#define CHORD_MS    60
+#define REC_PENDING ((volatile u8 *)0x200001C8)    /* + track: a recorded note waits for its release */
+#define REC_NOTE    ((volatile u8 *)0x20000558)    /* + track: its step note value */
 
 u32 fw_seq_note_on(void *player, u32 channel, u32 note, u32 velocity,
                    int track, u32 step, int pad, u32 tie);
@@ -66,6 +77,8 @@ void fw_midi_din(void *out, u32 message);
 u32 fw_transpose_get(struct seq *seq, int track);
 u32 fw_note_fit(struct seq *seq, u32 note, u32 transpose, u32 x);
 void fw_storage_read(void *storage, u32 address, u32 length);
+void fw_record_on(int track, u32 note, u32 velocity, int pad);
+void fw_step_on_set(struct seq *seq, int track, u32 on, u32 step, int pad);
 
 static void send(u32 status, u32 channel, u32 note, u32 velocity)
 {
@@ -217,6 +230,51 @@ void poly_step_velocity(struct seq *seq, int track, u32 velocity, u32 step, int 
         fw_step_velocity_set(seq, track, velocity, step, pad);
     else if (pending != 0xFF)
         P->notes[track][step][pending - 1].velocity = velocity;
+}
+
+/* Called by rec_on for a melodic track. Stock recording is one note at a
+ * time: a new pad ends the note before it, and letting go of the top pad of
+ * several held presses the one below again. */
+void poly_rec_on(int track, u32 note, u32 velocity, int pad)
+{
+    struct note *rec = P->rec[track];
+    u32 n = P->rec_count[track];
+
+    if (REC_PENDING[track]) {
+        /* A pad of the chord pressed again by a release. */
+        if ((note & 0xff) == REC_NOTE[track])
+            return;
+        for (u32 k = 0; k < n; k++)
+            if (rec[k].pitch == (note & 0xff) + 1)
+                return;
+        if (MS - P->rec_time[track] < CHORD_MS) {
+            if (n < EXTRA) {
+                rec[n].pitch = (note & 0xff) + 1;
+                rec[n].velocity = velocity;
+                P->rec_count[track] = n + 1;
+            }
+            return;
+        }
+    }
+    /* Ending the note before writes its step with its chord. */
+    fw_record_on(track, note, velocity, pad);
+    P->rec_count[track] = 0;
+    P->rec_time[track] = MS;
+}
+
+/* Replaces fw_step_on_set where record_note_off writes a melodic step
+ * (0x0802D83A, 0x0802D96E, 0x0802DA40): the step gets the recorded chord,
+ * or none. */
+void poly_rec_step(struct seq *seq, int track, u32 on, u32 step, int pad)
+{
+    fw_step_on_set(seq, track, on, step, pad);
+    if (!melodic(track) || step >= STEPS)
+        return;
+    clear_step(track, step);
+    for (u32 k = 0; k < P->rec_count[track]; k++) {
+        P->notes[track][step][k] = P->rec[track][k];
+        P->dirty[track] = 1;
+    }
 }
 
 /* -> where the pages of the pattern record at this address live. */

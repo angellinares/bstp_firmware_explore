@@ -94,6 +94,7 @@ POLY = (
         0x0800B91E, 0x0800DE12, 0x0800E116, 0x0800E8FA)]
     + [(0x0801BF18, 0x08013B48, "poly_step_note"),
        (0x0801BF46, 0x08010EEA, "poly_step_velocity")]
+    + [(site, 0x080115B8, "poly_rec_step") for site in (0x0802D83A, 0x0802D96E, 0x0802DA40)]
 )
 # feature -> (sources, compiler defines, redirects, first address of its code)
 # dump fits the image's last block, which the stock update already sends as
