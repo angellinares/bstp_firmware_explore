@@ -32,7 +32,7 @@
  * A ratcheted step shows in cyan.
  *
  * Lights: a step with a chance blinks once a second, a step with a condition
- * goes dark for half a second in two, in the track colour or in cyan. A held step is steady.
+ * blinks twice in a row every two seconds, in the track colour or in cyan. A held step is steady.
  */
 #include "fw.h"
 
@@ -618,7 +618,7 @@ u32 ui_swing_shown(struct seq *seq, int track)
 #define L_CHANCE  0x02                             /* it has a chance */
 #define L_COND    0x04                             /* it has a condition */
 #define LIT_CHANCE 0x7F7F                          /* two short blinks in two seconds */
-#define LIT_COND   0x0FFF                          /* one long dip in two seconds */
+#define LIT_COND   0xAFFF                          /* a double blink in two seconds */
 #define LED_OFF   8
 
 /* -> how the light of an on step differs from the track colour: L_ bits. A

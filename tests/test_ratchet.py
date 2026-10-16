@@ -639,7 +639,7 @@ def light(fw, on, ms, track=2, step=21, pad=6):
     return lit[0][2]
 
 
-@pytest.mark.parametrize("on, dark", [(CHANCE_ON, {7, 15}), (COND_ON, {12, 13, 14, 15}),
+@pytest.mark.parametrize("on, dark", [(CHANCE_ON, {7, 15}), (COND_ON, {12, 14}),
                                       (CHANCE_ON | 0x80, {7, 15}), (1, set()), (0x81, set())])
 def test_a_step_with_a_chance_or_condition_blinks(drum, on, dark):
     drum.write(RATE + 6 * 0x40 + 21, [2])

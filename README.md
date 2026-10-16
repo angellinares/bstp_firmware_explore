@@ -21,7 +21,7 @@ build tested here. You install it with MIDI Control Center, like any update.
 | Mod | What it does | Status |
 |---|---|---|
 | Step chance and conditions | Hold a step and turn **Randomness** to give it a chance to play, or **Probability** to give it a condition: `1-2` plays on pass 1 of every 2, `n13` on every pass but pass 1 of every 3, `1St` on the first pass only, up to `4-4`. On SEQ1, SEQ2 and, since 1.2.1, on DRUM steps of the selected pad. Saved with the pattern. | Runs on one unit |
-| Ratchets (version 1.4.1 of the mod above) | A DRUM step plays 2, 4 or 8 times inside its own length: hold the step and touch the roller strip, or record a roll finer than the track. Ratcheted steps light cyan. From 1.4.0, steps with a chance or a condition blink. | Built, not yet run on a device; the page offers 1.2.1 until it is |
+| Ratchets (version 1.4.2 of the mod above) | A DRUM step plays 2, 4 or 8 times inside its own length: hold the step and touch the roller strip, or record a roll finer than the track. Ratcheted steps light cyan. From 1.4.0, steps with a chance or a condition blink. | Built, not yet run on a device; the page offers 1.2.1 until it is |
 | Chords | Up to four notes on a SEQ1 or SEQ2 step, with chance and conditions. | Built, not yet run on a device; not on the page until it is |
 
 How to use each mod, with figures, is under "How to use it" on the patch page.
