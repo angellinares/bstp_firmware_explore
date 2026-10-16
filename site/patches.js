@@ -7,8 +7,8 @@ const PATCHES = {
   {
    "id": "trig",
    "name": "Step chance and conditions",
-   "version": "1.2.1",
-   "hardware": "1.2.1 runs on one device, 2026-10-13",
+   "version": "1.4.7",
+   "hardware": "1.4.7 runs on one device, 2026-10-17",
    "summary": "Each SEQ1, SEQ2 and DRUM step can have a chance to play (hold the step, turn Randomness) or a condition such as every second pass (hold the step, turn Probability).",
    "guide": [
     [
@@ -231,6 +231,54 @@ const PATCHES = {
      ]
     ],
     [
+     "Ratchets on DRUM steps",
+     [
+      "A ratchet makes a DRUM step play 2, 4 or 8 times inside its own length. On a 1/16 track, a ratchet of 2 gives a 1/32 roll. The step size of the track does not change.",
+      {
+       "steps": [
+        "Select the DRUM track and the pad.",
+        "Hold a step that is on.",
+        "Touch the roller strip at a rate finer than the step size of the track.",
+        "Read the ratchet on the display: r 2, r 4 or r 8.",
+        "Release the step."
+       ]
+      },
+      {
+       "list": [
+        "On a 1/16 track, 1/32 gives 2 hits.",
+        "On a 1/8 track, 1/16 gives 2 hits and 1/32 gives 4 hits.",
+        "On a 1/4 track, 1/8 gives 2 hits, 1/16 gives 4 hits and 1/32 gives 8 hits."
+       ]
+      },
+      "To remove the ratchet, touch the strip at the rate of the track or a coarser rate. The display shows r 1.",
+      {
+       "list": [
+        "Ratcheted steps light cyan, not purple.",
+        "Recording: when Record is on, a roll finer than the track marks each step in which the roll plays two or more hits.",
+        "All hits have the velocity of the step. The gate of the step applies to the gap between hits, at most 90 percent. Each hit ends before the next hit.",
+        "The mod decides a chance or a condition one time, for all hits of the step.",
+        "A drum pattern holds up to 96 ratchets. At the limit, the display shows FuL.",
+        "When you hold a drum step and turn Swing, the display shows the ratchet of the step. The swing does not change.",
+        "Ratchets do not play while the looper repeats steps."
+       ]
+      }
+     ]
+    ],
+    [
+     "Step lights",
+     [
+      {
+       "list": [
+        "A step with a chance blinks off one time each second.",
+        "A step with a condition blinks off two times in quick succession every two seconds.",
+        "A step with a ratchet blinks in cyan.",
+        "While you hold a step, its light does not blink."
+       ]
+      },
+      "A step has a chance or a condition, not both. Thus a step never blinks in both ways."
+     ]
+    ],
+    [
      "Saving and copying",
      [
       {
@@ -246,6 +294,61 @@ const PATCHES = {
     ]
    ],
    "changes": [
+    [
+     "1.4.7",
+     "2026-10-17",
+     "A strip touch on a held DRUM step now acts as a touch of Swing, so the display shows the ratchet for about 1.4 seconds. The 1.4.5 change did not show it on the device."
+    ],
+    [
+     "1.4.6",
+     "2026-10-17",
+     "A touch of Swing, Randomness or Probability without a turn also keeps a held step with a chance, a condition or a ratchet on when you release it. 1.4.4 covered only a turn."
+    ],
+    [
+     "1.4.5",
+     "2026-10-17",
+     "A strip touch on a held DRUM step shows the ratchet on the display: r 1, r 2, r 4, r 8 or FuL. Before, the display showed the ratchet only when Swing was the last knob turned."
+    ],
+    [
+     "1.4.4",
+     "2026-10-17",
+     "Hold a step with a chance, a condition or a ratchet and turn Swing, Randomness or Probability only to look at the value: the step stays on when you release it. Before, a look without a change turned the step off. A plain step still goes off, as stock."
+    ],
+    [
+     "1.4.3",
+     "2026-10-16",
+     "A press on a step that is on no longer removes its chance, condition or ratchet. Before, each new press of the step reset it to plainly on."
+    ],
+    [
+     "1.4.2",
+     "2026-10-16",
+     "A step with a condition blinks off two times in quick succession every two seconds, in place of the long dark gap of 1.4.1. A step with a chance still blinks off one time each second."
+    ],
+    [
+     "1.4.1",
+     "2026-10-16",
+     "The step lights blink at half the speed of 1.4.0: a chance blinks off one time each second, a condition goes off for half a second in every two seconds."
+    ],
+    [
+     "1.4.0",
+     "2026-10-16",
+     "Step lights: a step with a chance blinks off two times each second, a step with a condition goes off for a quarter of each second. A ratcheted step blinks in cyan. A held step does not blink."
+    ],
+    [
+     "1.3.2",
+     "2026-10-16",
+     "The Probability knob steps over n12 and n22. They play on the same passes as 2-2 and 1-2. A step saved with n12 or n22 keeps it and plays as before."
+    ],
+    [
+     "1.3.1",
+     "2026-10-13",
+     "Recording: a hit recorded over a rolled step now always removes its ratchet. 1.3.0 followed only the roller's own hits, one of the ten places a recorded hit comes from; it was never installed on a device."
+    ],
+    [
+     "1.3.0",
+     "2026-10-13",
+     "Ratchets on DRUM steps: a step can play 2, 4 or 8 times inside its own length. Hold a step and touch the roller strip at a rate finer than the track to set it, at the track's rate or coarser to clear it; recording a finer roll sets it too. Ratcheted steps light cyan. Up to 96 per drum pattern, saved with it."
+    ],
     [
      "1.2.1",
      "2026-10-13",
@@ -292,9 +395,24 @@ const PATCHES = {
      "2026-10-13",
      "1.2.1",
      "Copying a pattern works."
+    ],
+    [
+     "2026-10-16",
+     "1.3.2",
+     "A roll recorded finer than the track lights its steps cyan. The ratchets come back after a save and a power cycle."
+    ],
+    [
+     "2026-10-17",
+     "1.4.7",
+     "A step with a chance blinks once a second, a step with a condition blinks twice every two seconds. A ratcheted step stays cyan with a chance or a condition. A held step does not blink."
+    ],
+    [
+     "2026-10-17",
+     "1.4.7",
+     "A new press of a step, or a knob turn or touch to see its value, keeps its chance, condition and ratchet. A strip touch on a held DRUM step shows the ratchet on the display."
     ]
    ],
-   "unchecked": "Not yet reported from a device: swing, drum shift, reverse and alternate direction, changing pattern while playing, copy project, and long use.",
+   "unchecked": "Not yet reported from a device: swing, drum shift, reverse and alternate direction, changing pattern while playing, copy project, and long use. For ratchets: the timing of the hits, external clock, and copy of a pattern or a project.",
    "emulator": [
     [
      "Chance",
@@ -357,11 +475,208 @@ const PATCHES = {
       "Copy project takes the codes along",
       "Copy project of a pattern without codes clears the old ones"
      ]
+    ],
+    [
+     "Ratchets",
+     [
+      "A plain step ends as stock",
+      "A ratcheted step asks for its next hit",
+      "A tied step still ends before its next hit",
+      "No ratchets while the looper repeats",
+      "A ratchet bit without the step being on is nothing",
+      "A second ratchet waits for the first of its pad",
+      "The next hit joins the queue in time order",
+      "What the boundary adds is sorted in too",
+      "The order holds across the timer wrap",
+      "A full queue skips the hit",
+      "Every hit plays and the timer follows",
+      "A hit too close to catch is moved three ticks on",
+      "Stock events alone leave the timer to stock",
+      "The later hits do not draw again",
+      "Another step of the pad is not taken for a hit",
+      "The strip sets the held steps ratchet",
+      "The rate is the zone against the step size",
+      "The touch stays from the roller until the finger lifts",
+      "The strip is stock without a drum step that is on",
+      "A ratchet keeps the steps chance and the other way round",
+      "The pattern holds 96 ratchets",
+      "Swing is left alone with a drum step held",
+      "The display reads r and the hits or full",
+      "Other numbers are shown as before",
+      "A ratcheted step lights cyan",
+      "A finer roll marks the steps it fills",
+      "A roll at the tracks own rate records as stock",
+      "Recording over a ratchet with single hits removes it",
+      "Recording on the other tracks is stock",
+      "Ratchets come back after a save and a load",
+      "Ratchets alone are saved",
+      "96 ratchets fit",
+      "A step that is off now gets no ratchet",
+      "Damaged ratchets are dropped and the codes kept",
+      "A pattern saved by 1 2 1 loads without ratchets",
+      "Copy project takes the ratchets along",
+      "A ratcheted step stays cyan with a chance or condition",
+      "A step with a chance or condition blinks",
+      "Melodic steps blink too",
+      "A held step does not blink",
+      "Pressing a step that is on keeps it",
+      "Pressing a melodic step that is on keeps it",
+      "Pressing a step that is off switches it plainly on",
+      "Showing a knob keeps a held step with settings",
+      "A strip touch on a held step acts as a touch of swing",
+      "A strip touch without a held step leaves the display",
+      "Touching a knob keeps a held step with settings"
+     ]
     ]
    ],
-   "sha256": "864231ef0a38db673b59549940affac0fadb2db13e4bdbb7f71381ac4506a93d",
-   "file_sha256": "f8c5ce0ab4f4adb3ac29ba5816e9c46cdd58ad1d60d96528f4a89d16e82c0095",
+   "sha256": "1aa5e5864e9f741408d2de23ae2158b053f921b7e60c3cb96132c7e94267e8bf",
+   "file_sha256": "0105a1421da6d4da7358aa8cb19fdfa756bb7e1a283cdb95735da7cc7563f3a3",
    "edits": [
+    [
+     14864,
+     1,
+     "33"
+    ],
+    [
+     14866,
+     2,
+     "ebf8"
+    ],
+    [
+     16622,
+     1,
+     "9f"
+    ],
+    [
+     19936,
+     1,
+     "32"
+    ],
+    [
+     19938,
+     2,
+     "65f9"
+    ],
+    [
+     19984,
+     1,
+     "32"
+    ],
+    [
+     19986,
+     2,
+     "4df9"
+    ],
+    [
+     20034,
+     1,
+     "32"
+    ],
+    [
+     20036,
+     2,
+     "34f9"
+    ],
+    [
+     20082,
+     1,
+     "32"
+    ],
+    [
+     20084,
+     2,
+     "1cf9"
+    ],
+    [
+     20110,
+     1,
+     "32"
+    ],
+    [
+     20112,
+     2,
+     "0ef9"
+    ],
+    [
+     20778,
+     1,
+     "2e"
+    ],
+    [
+     23414,
+     1,
+     "31"
+    ],
+    [
+     23416,
+     1,
+     "28"
+    ],
+    [
+     23460,
+     1,
+     "31"
+    ],
+    [
+     23462,
+     2,
+     "57fc"
+    ],
+    [
+     23704,
+     1,
+     "31"
+    ],
+    [
+     23706,
+     2,
+     "ddfb"
+    ],
+    [
+     23734,
+     1,
+     "31"
+    ],
+    [
+     23736,
+     2,
+     "88fb"
+    ],
+    [
+     23784,
+     1,
+     "31"
+    ],
+    [
+     23786,
+     2,
+     "b5fb"
+    ],
+    [
+     24118,
+     1,
+     "31"
+    ],
+    [
+     24120,
+     2,
+     "0efb"
+    ],
+    [
+     24934,
+     1,
+     "5e"
+    ],
+    [
+     27536,
+     1,
+     "30"
+    ],
+    [
+     27538,
+     2,
+     "dafb"
+    ],
     [
      27584,
      1,
@@ -370,7 +685,7 @@ const PATCHES = {
     [
      27586,
      2,
-     "b5fb"
+     "aff9"
     ],
     [
      27632,
@@ -380,7 +695,7 @@ const PATCHES = {
     [
      27634,
      2,
-     "5ffc"
+     "42fa"
     ],
     [
      28206,
@@ -390,7 +705,7 @@ const PATCHES = {
     [
      28208,
      2,
-     "78fb"
+     "40fc"
     ],
     [
      28260,
@@ -400,7 +715,7 @@ const PATCHES = {
     [
      28262,
      2,
-     "5dfb"
+     "25fc"
     ],
     [
      28470,
@@ -410,7 +725,7 @@ const PATCHES = {
     [
      28472,
      2,
-     "f4fa"
+     "bcfb"
     ],
     [
      28570,
@@ -420,12 +735,12 @@ const PATCHES = {
     [
      28572,
      2,
-     "c2fa"
+     "8afb"
     ],
     [
      29090,
      1,
-     "0d"
+     "3d"
     ],
     [
      40454,
@@ -435,7 +750,7 @@ const PATCHES = {
     [
      40456,
      2,
-     "4cfc"
+     "32fd"
     ],
     [
      41424,
@@ -445,12 +760,12 @@ const PATCHES = {
     [
      41426,
      2,
-     "67fa"
+     "4dfb"
     ],
     [
      41558,
      2,
-     "94d8"
+     "c6d8"
     ],
     [
      42884,
@@ -460,22 +775,22 @@ const PATCHES = {
     [
      42886,
      2,
-     "3af8"
+     "20f9"
     ],
     [
      43636,
      1,
-     "8d"
+     "a6"
     ],
     [
      44044,
      1,
-     "2c"
+     "2d"
     ],
     [
      44046,
      2,
-     "9dff"
+     "57f9"
     ],
     [
      45178,
@@ -485,12 +800,12 @@ const PATCHES = {
     [
      45180,
      2,
-     "bcfd"
+     "78ff"
     ],
     [
      45714,
-     1,
-     "e0"
+     2,
+     "6d18"
     ],
     [
      45980,
@@ -500,177 +815,512 @@ const PATCHES = {
     [
      45982,
      2,
-     "3afc"
+     "f6fd"
     ],
     [
      47792,
-     1,
-     "57"
+     2,
+     "9a3f"
     ],
     [
      48030,
      1,
-     "2b"
+     "2c"
     ],
     [
      48032,
      2,
-     "eaff"
+     "a4f9"
     ],
     [
      49870,
-     2,
-     "d031"
+     1,
+     "1b"
+    ],
+    [
+     54606,
+     1,
+     "2a"
+    ],
+    [
+     54608,
+     1,
+     "91"
+    ],
+    [
+     56104,
+     1,
+     "28"
+    ],
+    [
+     56622,
+     1,
+     "29"
+    ],
+    [
+     56624,
+     1,
+     "21"
+    ],
+    [
+     58182,
+     1,
+     "82"
     ],
     [
      64964,
-     3,
-     "27f0f5"
+     4,
+     "27f0d1fd"
     ],
     [
      66494,
      2,
-     "c2f2"
+     "e5f2"
     ],
     [
      73466,
-     3,
-     "25f0b1"
+     4,
+     "25f08dfd"
     ],
     [
      74806,
      2,
-     "2393"
+     "4693"
     ],
     [
      75212,
-     3,
-     "25f057"
+     4,
+     "25f033fa"
     ],
     [
      75230,
-     3,
-     "25f04e"
+     4,
+     "25f02afa"
     ],
     [
      76866,
      4,
-     "24f01cfe"
+     "24f0f8fe"
     ],
     [
      76884,
      2,
-     "4be1"
+     "b5e0"
+    ],
+    [
+     80150,
+     1,
+     "23"
+    ],
+    [
+     80152,
+     1,
+     "61"
+    ],
+    [
+     81040,
+     1,
+     "30"
+    ],
+    [
+     81342,
+     1,
+     "23"
+    ],
+    [
+     81344,
+     2,
+     "36f8"
+    ],
+    [
+     83118,
+     1,
+     "65"
+    ],
+    [
+     90142,
+     4,
+     "21f0e1fc"
+    ],
+    [
+     91430,
+     1,
+     "b7"
+    ],
+    [
+     102798,
+     1,
+     "1e"
+    ],
+    [
+     102800,
+     1,
+     "ca"
+    ],
+    [
+     103898,
+     2,
+     "e3ce"
+    ],
+    [
+     106412,
+     1,
+     "1d"
+    ],
+    [
+     106414,
+     1,
+     "4a"
+    ],
+    [
+     106732,
+     1,
+     "1d"
+    ],
+    [
+     106734,
+     1,
+     "39"
+    ],
+    [
+     107090,
+     1,
+     "1d"
+    ],
+    [
+     107092,
+     1,
+     "86"
+    ],
+    [
+     108054,
+     1,
+     "55"
     ],
     [
      111212,
      4,
-     "1cf0ecf9"
+     "1bf0a4ff"
     ],
     [
      112210,
      2,
-     "a8ee"
+     "ebee"
     ],
     [
      112526,
      4,
-     "1bf06aff"
+     "1bf022fd"
+    ],
+    [
+     112996,
+     4,
+     "1bf07ffa"
     ],
     [
      114288,
      2,
-     "bba3"
+     "39a5"
+    ],
+    [
+     147970,
+     1,
+     "13"
+    ],
+    [
+     147972,
+     1,
+     "da"
+    ],
+    [
+     148064,
+     1,
+     "13"
+    ],
+    [
+     148066,
+     1,
+     "ab"
+    ],
+    [
+     148098,
+     1,
+     "13"
+    ],
+    [
+     148100,
+     1,
+     "0b"
+    ],
+    [
+     148304,
+     1,
+     "13"
+    ],
+    [
+     148306,
+     1,
+     "33"
+    ],
+    [
+     148398,
+     1,
+     "13"
+    ],
+    [
+     148400,
+     2,
+     "04fc"
+    ],
+    [
+     148432,
+     1,
+     "13"
+    ],
+    [
+     148434,
+     1,
+     "64"
+    ],
+    [
+     148948,
+     1,
+     "13"
+    ],
+    [
+     148950,
+     1,
+     "f1"
+    ],
+    [
+     148994,
+     1,
+     "13"
+    ],
+    [
+     148996,
+     1,
+     "4b"
+    ],
+    [
+     149614,
+     1,
+     "16"
+    ],
+    [
+     170624,
+     4,
+     "0ef017f8"
+    ],
+    [
+     170638,
+     4,
+     "0df026fe"
+    ],
+    [
+     170678,
+     4,
+     "0ef014f8"
     ],
     [
      170760,
      4,
-     "0ef01cf8"
+     "0df016fe"
+    ],
+    [
+     170774,
+     4,
+     "0df0e2fd"
     ],
     [
      170808,
      4,
-     "0ef04df8"
+     "0df047fe"
     ],
     [
      170890,
      4,
-     "0ef084f8"
+     "0df067fe"
+    ],
+    [
+     170904,
+     4,
+     "0df0a1fd"
     ],
     [
      170938,
      4,
-     "0ef09ff8"
+     "0df082fe"
+    ],
+    [
+     171296,
+     4,
+     "0df0c7fe"
+    ],
+    [
+     171310,
+     4,
+     "0df0d6fc"
+    ],
+    [
+     171344,
+     4,
+     "0df0c7fe"
     ],
     [
      171426,
      4,
-     "0df0cffe"
+     "0df0c9fc"
+    ],
+    [
+     171440,
+     4,
+     "0df095fc"
     ],
     [
      171474,
      4,
-     "0df000ff"
+     "0df0fafc"
     ],
     [
      171556,
      4,
-     "0df037ff"
+     "0df01afd"
+    ],
+    [
+     171570,
+     4,
+     "0df054fc"
     ],
     [
      171604,
      4,
-     "0df052ff"
+     "0df035fd"
     ],
     [
      172472,
      2,
-     "82ff"
+     "9f07"
+    ],
+    [
+     175118,
+     4,
+     "0cf0a1fd"
+    ],
+    [
+     175420,
+     1,
+     "0d"
+    ],
+    [
+     175422,
+     1,
+     "71"
+    ],
+    [
+     175546,
+     1,
+     "0d"
+    ],
+    [
+     175548,
+     1,
+     "32"
+    ],
+    [
+     176628,
+     2,
+     "16f4"
+    ],
+    [
+     193542,
+     18,
+     "081c6534ea3d0903980000000a00000008002de9f04381b046f240690446c2f2000902f00f0009ebc0071046984615460e4600f075f8b0b3787901380106787109d040f21860c2f2000000887988084438800020b87104eb8510304441f2d931405ceff3108872b679885a2828bf5a20484345f62941c0f28f21a0fb0101022000eb4100b4f8b076a4f8b006204631462a460123d9f711ffa4f8b07688f3108801b0bde8f0833f2e98bf0f2d08d9204631462a46434601b0bde8f043d9f7fdbe04eb8510304441f6f9714056b0f1ff3feddca8014844304490f8c00110f00309e5d094f8350b0028e1d1787950b140f21860c2f2000000883988401a00b2b0f1ff3fd4ddd4f8481b20460222d8f7edf820fa09f07880012000fa09f03e718ce710b546f2406ec2f2000edef8c02045f2434cc5f2412c624513d0002300220eebc204637102eb420401327444102a84f88230f4d100228ef8c620aef8c420cef8c0c00f2818d800f00f000eebc002507990b1107981424ff0000018bf10bd40f21861c2f20001098813885288c91a89b2914238bf012010bd002010bd80b5eef716fa40f27820c2f200000068bde88040ffe72de9f04f81b046f24064c2f200048146d4f8c01045f24340c5f24120814209f1080b13d00021002204ebc203597102eb420301322344102a83f88210f4d1002184f8c610a4f8c410c4f8c0004ff0000aeff3108372b600bf09ebca008068013006d00af1010abaf1200ff5d14ff0200a002701210020002504ebc50672792ab1b2791ab9baf11f0f04d377710135102df2d11ce034f8350032790bebca084bf83a004846022100932b4688f80450daf728f9009b88f805000af1010a01200f2d05f101054ff00001b071d5d103e0c90701d0002042e04ff0ff320bebca014bf83a204ff610728a8040f62401c4f200010988baf1020f31d3a1f5007109f110084ff00109009300bf5bf839e00bebc902d2f804c0aeeb010295b242464b4600bf32f8086c761ab6b2ae420ad9164656f8087d52f8044c013bc2e900743246efd1002309f101090bebc302d14508f108084bf833e0c2f804c0d6d1009b83f3108801b0bde8f08f10b50446d8f70dfe2046fff746ff58b340f60c0c04f10801c4f2000c0a68bcf8180093b2121a033a12b2b2f1ff3f9e460edc00f1030e1ffa8ef4002000bf51f830209a4204d141f8304001302028f6d14ff6ef70acf80400acf834e0bcf8000040f01000acf8000010bd2de9f04f81b01f4692460c468146d7f72efcc0f34506a6f1160bbbf1140f4ff00005804638bfa6f11505022c0ed1b8f1000f0bd038465146fff7b1fe002840f0bb802846002d18bf012026e0002d284618bf0120012c20d8fdb14ff40c7146f2004004fb0191c2f2000050f82400d1f8ec16022da1f10201b1fa81f14fea511120fa01f000f28180a91eb1fa81f14909002818bf012048408ae0022c4fd10f2f4dd800284bd009eb070b9bf8a90bd9f8481b9bf8896b9bf8997b009048460222d7f752ff0446002e4ff000005ad0002c58d0b74256d2b24554d248460221d6f7bdfcb0fbf4f142f209401bf800006fea0a02002808bf06eb020af21b00985244b2fbf6f3c01b38bf304403fb16220130b2fbf0f3b1fbf0f703fb102207fb00f300eb50073a445b1a1a44b2fbf0f303fb10221144b1eb500f19d200201be01bf1150f39d34846e3f78ffa4af6f641d9f80400c0f603013144400e642211f8011c5043b0ebc11f28bf4ff0000824e04208891ab1fbf0f0d9f84c1b0239b1fa81f14909c840022d7ff67fafe91e4af60b5321f00102c0f603039f187f789a5cb0fbf7f6013a06fb1700801a18bf01204840c00718bf4ff00008404601b0bde8f08f70b514460d46064600f007f8304629462246bde87040e5f7bdbe80b540f27820c2f20000006800f037f810b10078022800d280bdbde8804005e270b50d46113902291446064698bffff7e7ff304629462246bde87040e5f7a7bcb0b50c46054600f01af890b1007880b1c0f34500a0f1160111f1150f3cbf6420b0bd4af6f641c0f60301084410f8010cb0bd28462146bde8b040d7f7f4ba40f2f011c2f200010a68022a08d8e721c2f200015356002b02d48b563f2b01dd00207047022a0cd1d0f8502b0f2af7d891f9021000eb8210084441f6f971084470474ff40c7302fb03008956084400f6b700704770b515460e460446fff7d0ff28b1017819b1632d08d9002328e0204631462a46bde87040d7f799bbc1f34503a3f1160212f1150f4af6f642c0f603020bd3134413f8013c9d4206d9002300bfd65c0133b542fbd80ae014235e1c022e05d3d65c013bae42f8d8023300e0012301f0800141ea43010131017040f2f010c2f20000006842f25041204401224254bde8704063e1b0b50c460546fff788ff60b1007850b1c0f34501a1f1160014284ff0000038bfa1f11500b0bd28462146bde8b040d7f708bdb0b50c460546fff76fff68b1007858b1c0f34500a0f11601a0f115028020142938bf42f08000b0bd28462146bde8b040d7f7eebcf0b581b015460f460446fff753ff60b30646007848b3142d25f0020128bf142504290ad120463946fff7b7ff4ff0ff31854288bf012130780d4400f0800005f11501002d18bf40ea41000130307040f2f010c2f20000006842f2504120440122425401b0bde8f040fbe0204639462a4601b0bde8f040d7f75dbe2de9f04f81b046f24567c2f2000714460d46d7f8bb2045f24341c5f241218a42064613d00020002200bf07f8320002eb420301323b44102a83f87d00f5d1002087f8c100a7f8bf00c7f8bb10002d52d040f2f019c2f20009d9f8000002284dd13046fff7eafe002848d00078002845d040f20b039800080000000000a68d"
     ],
     [
      193560,
      18,
-     "081c6534ea3d0903a00000000a00000008002de9f04f81b01f4691460c468346d7f7e6f9c0f345058046a5f1160014284ff0000638bfa5f11506012c20d8feb14ff40c7146f2004004fb01b1c2f2000050f82400d1f8ec16022ea1f10201b1fa81f14fea511120fa01f000f28280b11eb1fa81f14909002818bf012048408be0022c50d10f2f4ed8002e4cd00beb070595f8a90bdbf8481b95f8897b95f899ab009058460222d7f720fd0446002f4ff000005bd0002c59d0ba4557d2b94555d258460221d6f78bfab0fbf4f142f20940285c6fea0902002808bf07eb0209a7eb0a0200984a44b2fbf7f3b0eb0a0038bf384403fb17220130b2fbf0f3b1fbf0f703fb102207fb00f300eb50073a445b1a1a44b2fbf0f303fb10221144b1eb500f19d200201be010f1150f39d35846e3f75cf84af67e11dbf80400c0f603012944400e642211f8011c5043b0ebc11f28bf4ff0000824e04208891ab1fbf0f0dbf84c1b0239b1fa81f14909c840022e7ff67eaff11e4af6931321f00102c0f603039f187f789a5cb0fbf7f6013a06fb1700801a18bf01204840c00718bf4ff00008404601b0bde8f08fb0b50c46054600f01af890b1007880b1c0f34500a0f1160111f1150f3cbf6420b0bd4af67e11c0f60301084410f8010cb0bd28462146bde8b040d7f7eeb840f2f011c2f200010a68022a08d8e721c2f200015356002b02d48b563f2b01dd00207047022a0cd1d0f8502b0f2af7d891f9021000eb8210084441f6f971084470474ff40c7302fb03008956084400f6b700704770b515460e460446fff7d0ff30b10146007818b1632d08d9002227e0204631462a46bde87040d7f792b9c0f34502a2f1160010f1150f4af67e10c0f603000ad3024412f8012c954205d90022835c01329d42fbd80ae01422531c022b05d3835c013aab42f8d8023200e001222046bde87040ffe7520040f2ca130132c2f200030a70d3f826100122084442f250414254d3f826004ff6fa61c254d3f82600cff6ff7118444056002809d4d3f82620d3f89a001a44515600222031e5f7e9ba7047b0b50c460546fff771ff60b1007850b1c0f34501a1f1160014284ff0000038bfa1f11500b0bd28462146bde8b040d7f7ebbab0b50c460546fff758ff68b1007858b1c0f34500a0f11601a0f115028020142938bf42f08000b0bd28462146bde8b040d7f7d1ba70b514460e460546fff73dff78b10146007860b12046142c28bf1420002c18bf00f1150428462246bde870408fe7284631462246bde87040d7f75fbc80b582b0b2f1ff3f0cdc02f07f03152b08d2022b10d0012b09d093b94ff0010c01221ee002b0bde88040e9f719bc4ff01b0c01221c2317e04ff01c0c2522012312e0da1e4af6931c22f00103c0f6030c0ceb030e1cf803309ef801c0d20702d11a46202300e02522cdf800c0e9f7d4fb02b080bd012916d84ff40c7c01fb0c0c9cf8f0c6624588bfd5f7e8bf80b546f2004cc2f2000c5cf821e00ef1010e4cf821e0bde88040d5f7d9bf012988bfd5f7d5bf80b546f2004cc2f2000c4ff0000e4cf821e0bde88040d5f7c8bf2de9f04740f27824c2f20004d4f800c02324c2f2000494f900e04ff40c740efb04c44ff00c0e04f6b70c6ff003040ceb040696f804807779b57996f807a0c8f3450807f0060648ea461602f80e60c7f3c30605f01e0702eb0e0946eac70689f80160c5f341150af07e06043445ea46053c2c0ef1030e89f80250d8d3c724d4724ff05a0c0c2412f804e001343c2c8cea0e0cf8d182f83cc0bde8f047e8f721bbb0b584b040f6653ec2f2000e9ef80030c72b41d14ff40c7301fb03009ef831c000f6b7005a23002100bf0eeb010252780131302983ea0203f7d19c452cd10ef101014ff0000c6a4600bf0b7891f801e003f03f059b098c786ef3850301934fea1e1364f305130293a30803930023009500bfc55c25b112f823506d000135c5540133042bf5d1bcf13c0f0cf1040c01f1030100f10400d8d304b0b0bd2de9f04f83b0834640f27820c2f2000046f200540568984691468a46c2f200040020002100bf605401313029fbd1002700262846314600f04af80136042e47ea0007f6d19fb3d720cde9019820704ff00409032004f1300600bf07462846394600f086f880462846394600f030f804eb4700a0f801805a200021621892f830200131c02980ea0200f7d104eb090108724fb10aeb072158463246c023e8f783fa781eb946d9e7dde90198f02300e030230af1100158462246e8f775fa584651464a46434603b0bde8f04fe8f76cba2de9f04f81b046f2305200eb011b0020c2f2000241f6fd7c41f6fe7e41f6ff794ff4005a002100bf6ff00306009100bf0beb060717f80c5017f80e30c5f34504590817f8098017f80a7044ea811441ea550102f8034b4fea5804c3f3c30341ea580143ea041341ea57017c0802f8023cc8f3411301f03f01043643ea84030c2e40ea010002f8013cd2d300990bf1400b01311029c8d1002818bf012001b0bde8f08fb0b5024641f60f50084402eb011141f6f9724ef6e03301eb020c4ff0000ecff6ff7310216246d45cc0eb401004f07f0412f8015b2044002d18bf8030013980b2f1d10ef1010ebef1100f0cf1400c08bfb0bde6e72de9f04f87b040f25372c2f200025778137896783a0242ea03424cf61b279319c0f26b07a3fb0776f7094ff4983607fb1633a3f5903313f5803fc0f08c808146886e40f65a3502904ff20000c0f2ff00104000f5406040f26d11019041f6f970c2f20005c2f2000148440df10c0b009000bf00200870dde901104ff48062e8f73cf9287cd7285dd1ddf800a0002705eb0728e819002f08bf05f14008407e5a21002218f802300132c02a0b03a0000800000000005a98"
+     "081c6534ea3d0903a00000000a0000000800e90ac2f2000ad6f8508b9af90020d6f8480b4ff0000b00f0030025fa00f002284ff0000308d30021042801f1010303d3400802291946f7d33046414600f032f880f0010008eb480187f8c1000120394487f8c00081f87db0d9f8001042f250423144885400f087f8d9f87400d9f8bc1011220a6011210122e5f72efb9620aaf8070002e0002087f8c00097f8c0002246002818bf00253046294601b0bde8f04fd8f78eba70b541f6f97500eb050e0eeb811c1cf90240dbb1002c0dd4002400251ef804600134b4f5806f05ebd615f7d15f2d01d9002113e0890146f600061144c2f200068b551cf8021061f07f0101e004f07f010cf8021042f2524201218154084670bdb0b540f2f012c2f2000212680c46022a054607d12846fff755fe18b1007808b13c20b0bd28462146bde8b040dbf743bc70b5144640f2f012c2f2000212680d46022a06460ed13046fff73cfe50b1007840b146f20670c2f2000000210170bde8704006e0304629462246bde87040dbf7eabc40f2ca11c2f20001d1f8260001224254d1f826004ff6fa620844cff6ff728056002809d4d1f82630d1f89a001944895600222031e5f785bb7047b0b540f2f012c2f2000212680d46022a044616d12046fff7fffd90b1007880b146f24560c2f20000d0f8bb2045f24341c5f241218a420ad190f8c100d8b1c420b0bd20462946bde8b040d8f72bba0022002300bf00f8332003eb430501330544102b85f87d20f5d1002280f8c120a0f8bf20c0f8bb10e920d4f8501bc2f2000002780f294ff0c00098bf3f2a00d9b0bd50b204eb8112024441f6f973d256b2f1ff3fc4bfc020b0bd8901084446f60001c2f20001405c302161f39f00b0bd2de9f04146f204781e4614460d460746c2f20008d7f7acf890b1022d12d13f2c4ff0000198bf0f2e0fd807eb8611214441f6f9728956b1f1ff3f1ddd002104e0002115e04ff0000112d8e722c2f20002aa5694420cd0c0f34502a2f12a0313f1140f04d2013a152a38bf023100e0043188f80010bde8f081b1014144214491f8fc1011f0030118bf0121dee7b0b546f2047ec2f2000e40f274539ef80040c2f200031b68e507c3f3c31c4ff0000318bf0422a5078ef8003006d5012303fa0cf347f67f752b420ad0630709d5012303fa0cf34af6ff752b4208bf082200e00822bde8b040e0f7edbd70b51c4640f27823c2f200031e6823460546f2f7c2ff022d56d10f2c88bf70bd46f2456142f24440c2f20001321804f00f0000eb4000d1f8bb3045f2434c0844c5f2412c634500f17b0e13d00025002300bf01f8335003eb430001330844102b80f87d50f5d1002381f8c130a1f8bf30c1f8bbc0507a41f6a701c2f2000120b3d6f8480b126800f0030022fa00f3022b1bd3002200bf042b02f1010603d35b08022a3246f7d39ef802208ab19ef800000b5d98420cd19ef80100b04208d1012a04bf02208ef8020070bd0023002600e00123085d8ef801608ef800008ef8023070bdb0b50c460546f3f725f8022d3fd10f2c3dd846f24560c2f2000004f00f0101eb4101d0f8bb3045f2434c0144c5f2412c634501f17b0112d00023002500f8353005eb450201350244102d82f87d30f5d1002380f8c130a0f8bf30c0f8bbc08878022814d30a783f2a88bfb0bd40f27820c2f20000006841f6f97500eb841313445b5d23b14b782146bde8b040eee5b0bd70b582b0ddf818c014463f2b02d90025002614e0022908d1bcf10f0ff7d800eb8c1241f6f976324407e00129efd84ff40c7201fb020202f6b702d65cd5182246cdf800c0d7f754f80cb106b12e7002b070bd80b582b012f13c0304d14ff01d0c0f2228230ae022f0030340330cd102f00302012303fa02fc1e222c23cdf800c0e9f72bfb02b080bdb2f1ff3f0cdc02f07f03152b08d2022b10d0012b09d093b94ff0010c01221ee002b0bde88040e9f738bb4ff01b0c01221c23dfe74ff01c0c25220123dae7da1e4af60b5c22f00103c0f6030c0ceb030e1cf803309ef801c0d20702d11a462023c8e72522c6e7012916d84ff40c7c01fb0c0c9cf8f0c6624588bfd5f70cbf80b546f2004cc2f2000c5cf821e00ef1010e4cf821e0bde88040d5f7fdbe10b5022906d246f2004cc2f2000c00244cf8214046f2456e4ff0000cc2f2000e002400bf0ef834c00134102cfad1bde81040d5f7e2be2de9f04740f27824c2f20004d4f800c02324c2f2000494f900e04ff40c740efb04c44ff00c0e04f6b70c6ff003040ceb040696f804807779b57996f807a0c8f3450807f0060648ea461602f80e60c7f3c30605f01e0702eb0e0946eac70689f80160c5f341150af07e06043445ea46053c2c0ef1030e89f80250d8d3c724d4724ff05a0c0c2412f804e001343c2c8cea0e0cf8d182f83cc0bde8f047e8f73bbab0b584b040f6653ec2f2000e9ef80030c72b41d14ff40c7301fb03009ef831c000f6b7005a23002100bf0eeb010252780131302983ea0203f7d19c452cd10ef101014ff0000c6a4600bf0b7891f801e003f03f059b098c786ef3850301934fea1e1364f305130293a30803930023009500bfc55c25b112f823506d000135c5540133042bf5d1bcf13c0f0cf1040c01f1030100f10400d8d304b0b0bd2de9f04f83b0834640f27820c2f2000046f20054d0f800a0984691460291c2f200040020002162180131c02982f80007f9d141f6f970504404f540710027002200bf002300bfc656b6f1ff3f13dcce5cb50710d05f2f0ed803eb861604eb470585f80067ce5c013706f03c0642ea860685f8016700bf0133402be4d101324031102a00f14000dcd10020002100bf605401313029fbd1002500265046314600f069f80b03a00008000000000011a6"
     ],
     [
      193596,
-     22,
-     "81ea0301f8d1884242d105eb4700b0f8114048463946"
+     240,
+     "0136042e45ea0005f6d155ea07004fd0d72045462070a5200021cdf804906773621892f800270131c02980ea0200f7d1a07304f5f0684ff00409032006465046314600f096f807465046314600f041f804eb4600a0f801705a200021621892f830200131c02980ea0200f7d104eb09010872c6b1002000bf18f8001022180130402882f8f010f7d1029804f1300200eb062158464ff48073e8f74ef9701ea8f14008b146cae7ddf80490f023a84600e03023029d584605f110012246e8f73cf9584629464a46434603b0bde8f04fe8f733b92de9f04f81b046f2305200eb011b0020c2f2000241f6fd7c41f6fe7e41f6"
     ],
     [
-     193619,
-     2,
-     "f774"
+     193837,
+     161,
+     "794ff4005a00216ff00306009100bf0beb060717f80c5017f80e30c5f34504590817f8098017f80a7044ea811441ea550102f8034b4fea5804c3f3c30341ea580143ea041341ea57017c0802f8023cc8f3411301f03f01043643ea84030c2e40ea010002f8013cd2d300990bf1400b01311029c8d1002818bf012001b0bde8f08fb0b5024641f60f50084402eb011141f6f9724ef6e03301eb020c4ff0000ecff6"
     ],
     [
-     193622,
-     156,
-     "844238d10020514600bf00230a4698f8006006f03f06039698f8006098f80140b60964f38506049698f8016098f80240360964f30516059698f80260b60806960026945d012c06d15bf82640292c9ebf6400013494550136042ef2d10c2b03f1040308f1030802f10402d0d30130102801f14001c9d10137042f0af1100aa4d140f26d11c2f20001087800288fd10120087007b0bde8f08f1fb506a9"
+     193999,
+     189,
+     "7310216246d45cc0eb401004f07f0412f8015b2044002d18bf8030013980b2f1d10ef1010ebef1100f0cf1400c08bfb0bde6e72de9f04f89b040f25372c2f200025778137896783a0242ea03424cf61b231644c0f26b03a6fb033546f24567c2f20007ed094ff4983445f2434305fb1466d7f8bb50c5f24123d1f868909d42049013d00020002100bf07f8310001eb410501313d44102985f87d00f5d1002087f8c100a7f8bf00c7f8bb30a6f5903010f5803fc0f0eb804ff20000c0f2"
     ],
     [
-     193779,
+     194189,
+     60,
+     "00104000f54060049940f65a3640f26d1b029041f6f970c2f20006c2f2000b08440df114080390cdf8049000208bf80000029948464ff48062e7f7e1"
+    ],
+    [
+     194250,
+     68,
+     "307cd72840f0bd80ddf80cb000274ff0000a06eb0729f019002f08bf06f14009407e5a21002219f802300132c02a81ea0301f8d1884246d106eb4700b0f8114004983946"
+    ],
+    [
+     194319,
      2,
      "f74e"
     ],
     [
-     193782,
-     184,
-     "bde81f40d9f7b3bc2de9f04f85b0064640f25370c2f200000d46417890f8009084784fea012a4aea0941102b18469b4628bf1020214433b101ab12f8017b013803f8017bf9d110313046f022e8f7a3f840f65a38c2f2000898f8007005f11001302330464246d72f08bff023e8f707f9d72f16d14fea0940504404444ff4807700bfe1193046c022e8f785f8e91930464246c023e8f7f3f807f58077b7f5806fefd101aa304629465b46e8f7e8f805b0bde8f08f1fb506aa"
+     194322,
+     250,
+     "84423cd10020594600bf00230a4699f8005005f03f05059599f8005099f80140ad0964f38505069599f8015099f802402d0964f30515079599f80250ad0808950025545d012c06d158f82540292c9ebf6400013454550135042df2d10c2b03f1040309f1030902f10402d0d30130102801f14001c9d10120b8404aea000a0137042f0bf1100ba0d1707f46f6004e00210022c2f2000e01f4407302f03f0733443b4493f8c03104310ef802300132c02af1d1ddf8049040f26d1b6028c2f2000b3bd8b17fa522002300bf1ef803700133c02b82ea0702f8d191422ed168b346f60141c2f2000111f8012c5fea921c1fd002f03f0217092afa07f7"
     ],
     [
-     193967,
+     194573,
+     41,
+     "0718d00d78039b05f00f0403eb8417bb56012b0fdba3013c2404ea950573444ff6004465441344cff6"
+    ],
+    [
+     194615,
+     47,
+     "741d55bb5c43f08003bb54013801f10201d6d100bf9bf8000000287ff431af01208bf8000009b0bde8f08f1fb506a9"
+    ],
+    [
+     194663,
+     114,
+     "f7ccfebde81f40d9f7f9ba2de9f04f85b0064640f25370c2f200000d46417890f8009084784fea012a4aea0941102b18469b4628bf1020214433b101ab12f8017b013803f8017bf9d110313046f022e7f7e9fe40f65a38c2f2000898f8007005f11001302330464246d72f08bff023e7f74d"
+    ],
+    [
+     194778,
+     43,
+     "d72f18d14fea0940504404444ff4807700bfe11930464ff48072e7f7cafee919304642464ff48073e7f737"
+    ],
+    [
+     194822,
+     21,
+     "07f58077b7f5806fedd101aa304629465b46e7f72c"
+    ],
+    [
+     194844,
+     10,
+     "05b0bde8f08f1fb506aa"
+    ],
+    [
+     194855,
      50,
-     "f7c0fdbde81f40d6f709bc01020406090d13192129323b434b51575b5e606263010202020103020303030104020403040404"
+     "f7eafcbde81f40d6f74dba01020406090d13192129323b434b51575b5e606263010202020103020303030104020403040404"
     ],
     [
      195610,
      34,
-     "627374702d6677207472696720312e322e3100000000000000000000000000003f15"
+     "627374702d6677207472696720312e342e370000000000000000000000000000bcbf"
     ],
     [
      195666,
      2,
-     "2c19"
+     "d821"
     ]
    ]
   }
