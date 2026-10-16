@@ -653,7 +653,6 @@ u32 ui_swing_shown(struct seq *seq, int track)
 /* Step lights. The main loop repaints the step buttons on every pass, so a
  * light can blink by the SysTick count (1 kHz). A cycle is 16 slots of 128 ms;
  * a set bit is a lit slot. */
-#define MS        (*(volatile u32 *)0x20000574)
 #define L_CYAN    0x01                             /* in MISC->led: the step has a ratchet */
 #define L_CHANCE  0x02                             /* it has a chance */
 #define L_COND    0x04                             /* it has a condition */
@@ -708,6 +707,12 @@ void rec_on(int track, u32 note, u32 velocity, int pad)
     struct rec *r = &REC[pad & 15];
     u32 code;
 
+#ifdef POLY
+    if ((u32)track < 2) {
+        poly_rec_on(track, note, velocity, pad);
+        return;
+    }
+#endif
     fw_record_on(track, note, velocity, pad);
     if (track != 2 || (u32)pad >= PADS)
         return;

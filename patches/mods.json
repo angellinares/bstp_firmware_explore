@@ -99,6 +99,7 @@
   "hardware": "not run on a device yet",
   "summary": "Up to four notes on a SEQ1 or SEQ2 step. Includes step chance and conditions. Chords are saved in a part of the storage chip the stock firmware does not use.",
   "changes": [
+   ["1.5.0", "2026-10-17", "Chords can be recorded live. Pads pressed within 60 ms of each other while Record is on go into one step as a chord, up to four notes. The chord ends when you let go of its last pad. A single note recorded over a chord step clears the chord."],
    ["1.4.7", "2026-10-17", "Step chance and conditions 1.4.7: a strip touch on a held DRUM step shows the ratchet."],
    ["1.4.6", "2026-10-17", "Step chance and conditions 1.4.6: a knob touch alone does not turn a held step off."],
    ["1.4.5", "2026-10-17", "Step chance and conditions 1.4.5: a strip touch on a held DRUM step shows the ratchet."],
