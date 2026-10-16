@@ -64,7 +64,7 @@
     {"list": ["Ratcheted steps light cyan, not purple.", "Recording: when Record is on, a roll finer than the track marks each step in which the roll plays two or more hits.", "All hits have the velocity of the step. The gate of the step applies to the gap between hits, at most 90 percent. Each hit ends before the next hit.", "The mod decides a chance or a condition one time, for all hits of the step.", "A drum pattern holds up to 96 ratchets. At the limit, the display shows FuL.", "When you hold a drum step and turn Swing, the display shows the ratchet of the step. The swing does not change.", "Ratchets do not play while the looper repeats steps."]}
    ], "1.3.0"],
    ["Step lights", [
-    {"list": ["A step with a chance blinks off two times each second.", "A step with a condition goes off for a quarter of each second.", "A step with a ratchet blinks in cyan.", "While you hold a step, its light does not blink."]},
+    {"list": ["A step with a chance blinks off one time each second.", "A step with a condition goes off for half a second in every two seconds.", "A step with a ratchet blinks in cyan.", "While you hold a step, its light does not blink."]},
     "A step has a chance or a condition, not both. Thus a step never blinks in both ways."
    ], "1.4.0"],
    ["Saving and copying", [
@@ -73,6 +73,7 @@
   ],
   "summary": "Each SEQ1, SEQ2 and DRUM step can have a chance to play (hold the step, turn Randomness) or a condition such as every second pass (hold the step, turn Probability).",
   "changes": [
+   ["1.4.1", "2026-10-16", "The step lights blink at half the speed of 1.4.0: a chance blinks off one time each second, a condition goes off for half a second in every two seconds."],
    ["1.4.0", "2026-10-16", "Step lights: a step with a chance blinks off two times each second, a step with a condition goes off for a quarter of each second. A ratcheted step blinks in cyan. A held step does not blink."],
    ["1.3.2", "2026-10-16", "The Probability knob steps over n12 and n22. They play on the same passes as 2-2 and 1-2. A step saved with n12 or n22 keeps it and plays as before."],
    ["1.3.1", "2026-10-13", "Recording: a hit recorded over a rolled step now always removes its ratchet. 1.3.0 followed only the roller's own hits, one of the ten places a recorded hit comes from; it was never installed on a device."],
@@ -92,6 +93,7 @@
   "hardware": "not run on a device yet",
   "summary": "Up to four notes on a SEQ1 or SEQ2 step. Includes step chance and conditions. Chords are saved in a part of the storage chip the stock firmware does not use.",
   "changes": [
+   ["1.4.1", "2026-10-16", "Step chance and conditions 1.4.1: the step lights blink at half the speed."],
    ["1.4.0", "2026-10-16", "Step chance and conditions 1.4.0: steps with a chance or a condition blink."],
    ["1.3.2", "2026-10-16", "Step chance and conditions 1.3.2: the Probability knob steps over n12 and n22."],
    ["1.3.1", "2026-10-13", "Step chance and conditions 1.3.1."],

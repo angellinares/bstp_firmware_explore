@@ -644,15 +644,15 @@ def light(fw, on, ms, track=2, step=21, pad=6):
 def test_a_step_with_a_chance_or_condition_blinks(drum, on, dark):
     drum.write(RATE + 6 * 0x40 + 21, [2])
     colour = 4 if on & 0x80 else 5
-    assert [light(drum, on, slot * 64 + 5) for slot in range(16)] == [8 if s in dark else colour for s in range(16)]
+    assert [light(drum, on, slot * 128 + 5) for slot in range(16)] == [8 if s in dark else colour for s in range(16)]
 
 
 def test_melodic_steps_blink_too(drum):
-    assert light(drum, COND_ON, 12 * 64, track=0) == 8
+    assert light(drum, COND_ON, 12 * 128, track=0) == 8
     assert light(drum, COND_ON, 0, track=0) == 5
 
 
 def test_a_held_step_does_not_blink(drum):
     hold(drum, 6, 21, CHANCE_ON)
-    assert light(drum, CHANCE_ON, 7 * 64) == 5
-    assert light(drum, CHANCE_ON, 7 * 64, step=22) == 8
+    assert light(drum, CHANCE_ON, 7 * 128) == 5
+    assert light(drum, CHANCE_ON, 7 * 128, step=22) == 8
