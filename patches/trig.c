@@ -58,7 +58,8 @@ void fw_button_flag(void *buttons, int id, int value);
 #define HOLD_USED  ((volatile u8 *)0x200001CA)    /* per track; set: releasing the step does not toggle it */
 #define HELD_PAD   ((volatile s8 *)0x200000C4)    /* per track; the held step button, 0..15 */
 #define BUTTONS    (*(void **)0x20000264)
-#define KNOB_WAKE  ((volatile u8 *)0x20000046)  /* per knob from Swing: turns that only show the value */
+#define SHOWN_KNOB (*(u32 *volatile *)0x200002AC)  /* -> the main loop's variable: the knob whose value the display shows */
+#define TOUCH_HOLD (*(volatile u16 *)0x200000F0)  /* ~9 ms counts a knob touch stays shown after the finger leaves */
 #define STEP_BUTTON 0x20                          /* id of the first step button */
 
 #define MELODIC_ON 0x8B7  /* seq + track * 0x230 + this + step */
@@ -149,7 +150,6 @@ struct misc {
     u8 led;         /* L_ bits of the step whose light is being chosen */
     u8 swallow;     /* the strip touch set a ratchet: it must not start the roller */
     u8 full;        /* the last strip touch found the pattern full */
-    u32 *shown;     /* the main loop's variable: the knob whose value the display shows */
 };
 #define MISC ((struct misc *)0x20006700)
 #define MISC_MAGIC 0x52415443
@@ -172,7 +172,6 @@ void fw_drum_events(struct seq *seq, u32 a, u32 b, u32 c);
 u32 fw_step_map(struct seq *seq, int track, u32 step, int pad);
 void fw_led(void *leds, int index, int colour);
 void fw_strip_set(struct seq *seq, u32 zone, int send);
-void fw_encoders_poll(u32 *shown);
 void fw_knob_touch(void *buttons, int knob, int on);
 void fw_knob_show(void *buttons, int knob, int on);
 u32 fw_swing_get(struct seq *seq, int track);
@@ -598,16 +597,6 @@ static u32 zone_code(struct seq *seq, u32 zone)
     return code;
 }
 
-/* Replaces the call to encoders_poll in the main loop (0x0800C196). The
- * main loop keeps the knob the display shows in a variable on its own
- * stack, and encoders_poll sets it to the last knob turned. A strip touch
- * that sets a ratchet sets it to Swing, so the display shows the ratchet. */
-void knobs_poll(u32 *shown)
-{
-    MISC->shown = shown;
-    fw_encoders_poll(shown);
-}
-
 /* Replaces the setter the touch strip reader calls with the zone it found
  * (0x08007CC0 and four more). With a drum step held the touch sets that
  * step's ratchet and is kept from the roller and the looper until the finger
@@ -624,11 +613,10 @@ void strip_set(struct seq *seq, u32 zone, int send)
         MISC->swallow = 1;
         REC[pad].count = 0;
         touched(seq);
-        fw_knob_show(BUTTONS, 0x11, 1);            /* the Swing knob's value: ui_swing_shown */
-        if ((u32)MISC->shown - 0x20000000u < 0xC000u) {
-            *MISC->shown = 0x11;
-            KNOB_WAKE[0] = 3;                      /* as when Swing is turned after another knob */
-        }
+        /* What a touch of Swing does: its value is ui_swing_shown, the ratchet. */
+        *SHOWN_KNOB = 0x11;
+        fw_knob_touch(BUTTONS, 0x11, 1);
+        TOUCH_HOLD = 150;
     }
     fw_strip_set(seq, MISC->swallow ? 0 : zone, send);
 }

@@ -308,7 +308,9 @@ def test_another_step_of_the_pad_is_not_taken_for_a_hit(drum):
 # Panel
 
 def strip(fw):
-    return fw.spy(STRIP_SET, count=3), fw.spy(KNOB_SHOW, count=3)
+    """Spy the roller's setter and the knob touch -> both call lists."""
+    fw.write(0x200002AC, struct.pack("<I", 0x2000B100))   # where the main loop keeps the knob shown
+    return fw.spy(STRIP_SET, count=3), fw.spy(0x0801F6D8, count=3)
 
 
 def test_the_strip_sets_the_held_steps_ratchet(drum):
@@ -318,7 +320,7 @@ def test_the_strip_sets_the_held_steps_ratchet(drum):
     drum.call(SYM["strip_set"], SEQ, 8, 1)                # 1/32 on a 1/16 track
     assert drum.read(on_addr(6, 21), 1)[0] == 0x81 and drum.read(RATE + 6 * 0x40 + 21, 1)[0] == 1
     assert passed == [[SEQ, 0, 1]], "the roller does not hear of the touch"
-    assert shown == [[0, 0x11, 1]], "the display is asked for the Swing knob's value"
+    assert shown == [[0, 0x11, 1]], "the strip touch acts as a touch of Swing, whose value is the ratchet"
     assert drum.read(SEQ + DRUM_DIRTY, 1) == b"\1" and drum.read(HOLD_USED + 2, 1) == b"\1"
     assert drum.call(SYM["ui_swing_shown"], SEQ, 2) & 0xFF == 0xC1
 
@@ -704,28 +706,27 @@ def test_showing_a_knob_keeps_a_held_step_with_settings(drum, on, kept):
 
 # The display after a strip touch
 
+SHOWN_PTR = 0x200002AC
 SHOWN_KNOB = 0x2000B100   # stands in for the main loop's variable
-ENCODERS_POLL = 0x0802BEE4
-KNOB_WAKE = 0x20000046
+TOUCH_HOLD = 0x200000F0
 
 
-def test_a_strip_touch_on_a_held_step_puts_swing_on_the_display(drum):
-    polled = drum.spy(ENCODERS_POLL, count=1)
-    drum.call(SYM["knobs_poll"], SHOWN_KNOB)
-    assert polled == [[SHOWN_KNOB]]
-    drum.write(SHOWN_KNOB, struct.pack("<I", 0x12))       # Randomness was turned last
-    drum.write(KNOB_WAKE, [0, 0, 0])
-    strip(drum)
+def test_a_strip_touch_on_a_held_step_acts_as_a_touch_of_swing(drum):
+    drum.write(SHOWN_PTR, struct.pack("<I", SHOWN_KNOB))
+    drum.write(SHOWN_KNOB, struct.pack("<I", 0x12))       # Randomness was touched last
+    drum.write(TOUCH_HOLD, [0, 0])
+    _, touched = strip(drum)
+    drum.write(SHOWN_KNOB, struct.pack("<I", 0x12))
     drum.spy(BUTTON_FLAG)
     hold(drum, 6, 21)
     drum.call(SYM["strip_set"], SEQ, 8, 1)
     assert struct.unpack("<I", drum.read(SHOWN_KNOB, 4))[0] == 0x11
-    assert drum.read(KNOB_WAKE, 1)[0] == 3
+    assert touched == [[0, 0x11, 1]]
+    assert struct.unpack("<H", drum.read(TOUCH_HOLD, 2))[0] == 150
 
 
 def test_a_strip_touch_without_a_held_step_leaves_the_display(drum):
-    drum.spy(ENCODERS_POLL, count=1)
-    drum.call(SYM["knobs_poll"], SHOWN_KNOB)
+    drum.write(SHOWN_PTR, struct.pack("<I", SHOWN_KNOB))
     drum.write(SHOWN_KNOB, struct.pack("<I", 0x12))
     strip(drum)
     drum.write(CUR_TRACK, struct.pack("<i", 2))
