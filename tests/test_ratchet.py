@@ -606,3 +606,53 @@ def test_copy_project_takes_the_ratchets_along(drum):
     ratchet_pattern(drum, {})
     stock_reload(drum, chip, base=OTHER)
     assert stored(drum) == RATCHETS
+
+
+@pytest.mark.parametrize("knob, value", [("ui_chance_set", 50), ("ui_cond_set", 3)])
+def test_a_ratcheted_step_stays_cyan_with_a_chance_or_condition(drum, knob, value):
+    drum.spy(BUTTON_FLAG, count=3)
+    lit = drum.spy(LED, count=3)
+    hold(drum, 6, 21, 0x81)
+    drum.write(RATE + 6 * 0x40 + 21, [2])
+    drum.call(SYM[knob], SEQ, 2, value)
+    assert drum.read(on_addr(6, 21), 1)[0] & 0x80
+    drum.call(SYM["led_step_on"], SEQ, 2, 21, 6)
+    drum.call(SYM["led_colour"], 0x2000A000, 5, 5)
+    assert [call[1:] for call in lit] == [[5, 4]]
+
+
+# Blinking lights
+
+MS = 0x20000574
+CHANCE_ON = 1 | 10 << 1                                   # chance code 10: 41 percent
+COND_ON = 1 | (21 + 3) << 1                               # condition 1-2
+
+
+def light(fw, on, ms, track=2, step=21, pad=6):
+    """Paint one step at SysTick count ms -> the colour it got (5 is the track's)."""
+    lit = fw.spy(LED, count=3)
+    fw.write(on_addr(pad, step) if track == 2 else SEQ + track * 0x230 + 0x8B7 + step, [on])
+    fw.write(MS, struct.pack("<I", ms))
+    fw.spy(STEP_ON, result=on)
+    fw.call(SYM["led_step_on"], SEQ, track, step, pad)
+    fw.call(SYM["led_colour"], 0x2000A000, step & 15, 5)
+    return lit[0][2]
+
+
+@pytest.mark.parametrize("on, dark", [(CHANCE_ON, {7, 15}), (COND_ON, {12, 13, 14, 15}),
+                                      (CHANCE_ON | 0x80, {7, 15}), (1, set()), (0x81, set())])
+def test_a_step_with_a_chance_or_condition_blinks(drum, on, dark):
+    drum.write(RATE + 6 * 0x40 + 21, [2])
+    colour = 4 if on & 0x80 else 5
+    assert [light(drum, on, slot * 64 + 5) for slot in range(16)] == [8 if s in dark else colour for s in range(16)]
+
+
+def test_melodic_steps_blink_too(drum):
+    assert light(drum, COND_ON, 12 * 64, track=0) == 8
+    assert light(drum, COND_ON, 0, track=0) == 5
+
+
+def test_a_held_step_does_not_blink(drum):
+    hold(drum, 6, 21, CHANCE_ON)
+    assert light(drum, CHANCE_ON, 7 * 64) == 5
+    assert light(drum, CHANCE_ON, 7 * 64, step=22) == 8

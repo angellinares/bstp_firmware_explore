@@ -30,6 +30,9 @@
  * steps it fills. Bit 7 of the on byte says the step has a ratchet, so the
  * stock setter drops it with the codes; the rate is in patch RAM (RATE).
  * A ratcheted step shows in cyan.
+ *
+ * Lights: a step with a chance blinks twice a second, a step with a condition
+ * dips once a second, in the track colour or in cyan. A held step is steady.
  */
 #include "fw.h"
 
@@ -141,7 +144,7 @@ struct rec {
 
 struct misc {
     u32 magic;
-    u8 led;         /* the step whose light is being chosen has a ratchet */
+    u8 led;         /* L_ bits of the step whose light is being chosen */
     u8 swallow;     /* the strip touch set a ratchet: it must not start the roller */
     u8 full;        /* the last strip touch found the pattern full */
 };
@@ -607,20 +610,51 @@ u32 ui_swing_shown(struct seq *seq, int track)
     return SHOW_RATCHET | (MISC->full ? 4 : ratchet_of(seq, *(u32 *)((u8 *)seq + DRUM_PAD), HELD_STEP[2]));
 }
 
+/* Step lights. The main loop repaints the step buttons on every pass, so a
+ * light can blink by the SysTick count (1 kHz). A cycle is 16 slots of 64 ms;
+ * a set bit is a lit slot. */
+#define MS        (*(volatile u32 *)0x20000574)
+#define L_CYAN    0x01                             /* in MISC->led: the step has a ratchet */
+#define L_CHANCE  0x02                             /* it has a chance */
+#define L_COND    0x04                             /* it has a condition */
+#define LIT_CHANCE 0x7F7F                          /* two short blinks a second */
+#define LIT_COND   0x0FFF                          /* one long dip a second */
+#define LED_OFF   8
+
+/* -> how the light of an on step differs from the track colour: L_ bits. A
+ * held step does not blink, so that what the knobs change stays readable. */
+static u32 look_of(struct seq *seq, int track, int step, int pad, u32 on)
+{
+    u32 code = on >> 1 & 0x3f, look = track == 2 && ratchet_of(seq, pad, step) ? L_CYAN : 0;
+
+    if ((u32)track > 2 || HELD_STEP[track] == step)
+        return look;
+    if (cond_of(on))
+        return look | L_COND;
+    return code && code <= CODES ? look | L_CHANCE : look;
+}
+
 /* Replace, where the step buttons are lit, the read of each step (0x08008A1A,
  * 0x08008B5A) and the call that gives an on step the track's colour (four
- * sites): a ratcheted step is cyan. The play cursor is painted after. */
+ * sites): a ratcheted step is cyan, a step with a chance or a condition
+ * blinks. The play cursor is painted after. */
 u32 led_step_on(struct seq *seq, int track, int step, int pad)
 {
-    MISC->led = track == 2 && ratchet_of(seq, pad, step);
-    return fw_step_on(seq, track, step, pad);
+    u32 on = fw_step_on(seq, track, step, pad);
+
+    MISC->led = on ? look_of(seq, track, step, pad, on) : 0;
+    return on;
 }
 
 void led_colour(void *leds, int index, int colour)
 {
-    if (MISC->led)
-        colour = 4;
+    u32 look = MISC->led, slot = MS >> 6 & 15;
+
     MISC->led = 0;
+    if (look & L_CYAN)
+        colour = 4;
+    if ((look & L_CHANCE && !(LIT_CHANCE >> slot & 1)) || (look & L_COND && !(LIT_COND >> slot & 1)))
+        colour = LED_OFF;
     fw_led(leds, index, colour);
 }
 
