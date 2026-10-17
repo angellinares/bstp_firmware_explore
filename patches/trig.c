@@ -30,10 +30,14 @@
  * steps it fills. Bit 7 of the on byte says the step has a ratchet, so the
  * stock setter drops it with the codes; the rate is in patch RAM (RATE).
  * A ratcheted step shows in cyan.
+ *
+ * Lights: a step with a chance blinks once a second, a step with a condition
+ * blinks twice in a row every two seconds, in the track colour or in cyan. A held step is steady.
  */
 #include "fw.h"
 
 u32 fw_step_on(struct seq *seq, int track, int step, int pad);
+void fw_step_on_set(struct seq *seq, int track, u32 on, int step, int pad);
 u32 fw_rand_get(struct seq *seq, int track);
 void fw_rand_set(struct seq *seq, int track, u32 value);
 void fw_prob_set(struct seq *seq, int track, u32 value);
@@ -54,6 +58,8 @@ void fw_button_flag(void *buttons, int id, int value);
 #define HOLD_USED  ((volatile u8 *)0x200001CA)    /* per track; set: releasing the step does not toggle it */
 #define HELD_PAD   ((volatile s8 *)0x200000C4)    /* per track; the held step button, 0..15 */
 #define BUTTONS    (*(void **)0x20000264)
+#define SHOWN_KNOB (*(u32 *volatile *)0x200002AC)  /* -> the main loop's variable: the knob whose value the display shows */
+#define TOUCH_HOLD (*(volatile u16 *)0x200000F0)  /* ~9 ms counts a knob touch stays shown after the finger leaves */
 #define STEP_BUTTON 0x20                          /* id of the first step button */
 
 #define MELODIC_ON 0x8B7  /* seq + track * 0x230 + this + step */
@@ -141,7 +147,7 @@ struct rec {
 
 struct misc {
     u32 magic;
-    u8 led;         /* the step whose light is being chosen has a ratchet */
+    u8 led;         /* L_ bits of the step whose light is being chosen */
     u8 swallow;     /* the strip touch set a ratchet: it must not start the roller */
     u8 full;        /* the last strip touch found the pattern full */
 };
@@ -166,6 +172,7 @@ void fw_drum_events(struct seq *seq, u32 a, u32 b, u32 c);
 u32 fw_step_map(struct seq *seq, int track, u32 step, int pad);
 void fw_led(void *leds, int index, int colour);
 void fw_strip_set(struct seq *seq, u32 zone, int send);
+void fw_knob_touch(void *buttons, int knob, int on);
 void fw_knob_show(void *buttons, int knob, int on);
 u32 fw_swing_get(struct seq *seq, int track);
 void fw_swing_set(struct seq *seq, int track, u32 value);
@@ -416,14 +423,49 @@ static u8 *held(struct seq *seq)
     return step_on(seq, track) + HELD_STEP[track];
 }
 
-/* The held step was changed: the pattern needs saving, and letting go of the
- * step must leave it on, as after the stock hold-a-step-and-press-a-pad. */
-static void touched(struct seq *seq)
+/* Letting go of the held step must leave it on, as after the stock
+ * hold-a-step-and-press-a-pad. */
+static void keep_held(void)
 {
-    ((u8 *)seq)[DIRTY + CUR_TRACK] = 1;
     HOLD_USED[CUR_TRACK] = 1;
     if (HELD_PAD[CUR_TRACK] >= 0)
         fw_button_flag(BUTTONS, HELD_PAD[CUR_TRACK] + STEP_BUTTON, 0);
+}
+
+/* The held step was changed: the pattern needs saving, and the step stays on. */
+static void touched(struct seq *seq)
+{
+    ((u8 *)seq)[DIRTY + CUR_TRACK] = 1;
+    keep_held();
+}
+
+/* A held step with a chance, a condition or a ratchet whose value is only
+ * looked at stays on when it is let go. A plain step still goes off, as stock. */
+static void looked_at(void)
+{
+    u8 *step = held(SEQ);
+
+    if (step && *step & ~1u)
+        keep_held();
+}
+
+/* Replaces the call that shows a knob's value in the Swing, Randomness and
+ * Probability handlers (six sites), which comes before the setter and also
+ * when the value is at its end and the setter is not called. */
+void ui_knob_show(void *buttons, int knob, int on)
+{
+    looked_at();
+    fw_knob_show(buttons, knob, on);
+}
+
+/* Replaces the call that notes a touch of Tempo, Swing, Randomness or
+ * Probability (0x0802D224): the knobs sense touch, and a touch alone shows
+ * the value. It comes on every scan while the knob is touched. */
+void ui_knob_touch(void *buttons, int knob, int on)
+{
+    if (knob >= 0x11 && knob <= 0x13)
+        looked_at();
+    fw_knob_touch(buttons, knob, on);
 }
 
 static void set_code(struct seq *seq, u8 *on, u32 code)
@@ -571,7 +613,10 @@ void strip_set(struct seq *seq, u32 zone, int send)
         MISC->swallow = 1;
         REC[pad].count = 0;
         touched(seq);
-        fw_knob_show(BUTTONS, 0x11, 1);            /* the Swing knob's value: ui_swing_shown */
+        /* What a touch of Swing does: its value is ui_swing_shown, the ratchet. */
+        *SHOWN_KNOB = 0x11;
+        fw_knob_touch(BUTTONS, 0x11, 1);
+        TOUCH_HOLD = 150;
     }
     fw_strip_set(seq, MISC->swallow ? 0 : zone, send);
 }
@@ -589,9 +634,7 @@ void ui_swing_set(struct seq *seq, int track, u32 value)
 {
     if (drum_held(seq)) {
         MISC->full = 0;
-        HOLD_USED[2] = 1;
-        if (HELD_PAD[2] >= 0)
-            fw_button_flag(BUTTONS, HELD_PAD[2] + STEP_BUTTON, 0);
+        keep_held();
     } else {
         fw_swing_set(seq, track, value);
     }
@@ -607,20 +650,50 @@ u32 ui_swing_shown(struct seq *seq, int track)
     return SHOW_RATCHET | (MISC->full ? 4 : ratchet_of(seq, *(u32 *)((u8 *)seq + DRUM_PAD), HELD_STEP[2]));
 }
 
+/* Step lights. The main loop repaints the step buttons on every pass, so a
+ * light can blink by the SysTick count (1 kHz). A cycle is 16 slots of 128 ms;
+ * a set bit is a lit slot. */
+#define L_CYAN    0x01                             /* in MISC->led: the step has a ratchet */
+#define L_CHANCE  0x02                             /* it has a chance */
+#define L_COND    0x04                             /* it has a condition */
+#define LIT_CHANCE 0x7F7F                          /* two short blinks in two seconds */
+#define LIT_COND   0xAFFF                          /* a double blink in two seconds */
+#define LED_OFF   8
+
+/* -> how the light of an on step differs from the track colour: L_ bits. A
+ * held step does not blink, so that what the knobs change stays readable. */
+static u32 look_of(struct seq *seq, int track, int step, int pad, u32 on)
+{
+    u32 code = on >> 1 & 0x3f, look = track == 2 && ratchet_of(seq, pad, step) ? L_CYAN : 0;
+
+    if ((u32)track > 2 || HELD_STEP[track] == step)
+        return look;
+    if (cond_of(on))
+        return look | L_COND;
+    return code && code <= CODES ? look | L_CHANCE : look;
+}
+
 /* Replace, where the step buttons are lit, the read of each step (0x08008A1A,
  * 0x08008B5A) and the call that gives an on step the track's colour (four
- * sites): a ratcheted step is cyan. The play cursor is painted after. */
+ * sites): a ratcheted step is cyan, a step with a chance or a condition
+ * blinks. The play cursor is painted after. */
 u32 led_step_on(struct seq *seq, int track, int step, int pad)
 {
-    MISC->led = track == 2 && ratchet_of(seq, pad, step);
-    return fw_step_on(seq, track, step, pad);
+    u32 on = fw_step_on(seq, track, step, pad);
+
+    MISC->led = on ? look_of(seq, track, step, pad, on) : 0;
+    return on;
 }
 
 void led_colour(void *leds, int index, int colour)
 {
-    if (MISC->led)
-        colour = 4;
+    u32 look = MISC->led, slot = MS >> 7 & 15;
+
     MISC->led = 0;
+    if (look & L_CYAN)
+        colour = 4;
+    if ((look & L_CHANCE && !(LIT_CHANCE >> slot & 1)) || (look & L_COND && !(LIT_COND >> slot & 1)))
+        colour = LED_OFF;
     fw_led(leds, index, colour);
 }
 
@@ -634,6 +707,12 @@ void rec_on(int track, u32 note, u32 velocity, int pad)
     struct rec *r = &REC[pad & 15];
     u32 code;
 
+#ifdef POLY
+    if ((u32)track < 2) {
+        poly_rec_on(track, note, velocity, pad);
+        return;
+    }
+#endif
     fw_record_on(track, note, velocity, pad);
     if (track != 2 || (u32)pad >= PADS)
         return;
@@ -662,6 +741,22 @@ void rec_off(int track, int pad, int tie)
     ready();
     if (r->count >= 2 && r->step < STEPS && ((u8 *)SEQ)[DRUM_ON + pad * 0x40 + r->step])
         set_ratchet(SEQ, pad, r->step, r->code);
+}
+
+/* Replaces the setter where a press of a step button switches the step on
+ * (0x08018B02). The press comes before the release decides whether to turn
+ * it off, so it also hits a step that is already on: that step keeps its
+ * chance or condition and its ratchet. The stock setter still runs, for the
+ * drum step count it keeps. */
+void press_on(struct seq *seq, int track, u32 on, int step, int pad)
+{
+    u8 *at = (u32)step >= STEPS ? 0 : track == 2 ? ((u32)pad < PADS ? (u8 *)seq + DRUM_ON + pad * 0x40 + step : 0)
+             : (u32)track < 2 ? step_on(seq, track) + step : 0;
+    u32 was = at ? *at : 0;
+
+    fw_step_on_set(seq, track, on, step, pad);
+    if (on && was)
+        *at = was;
 }
 
 /* Display glyphs: 0..9 are the digits. */

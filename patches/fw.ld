@@ -7,6 +7,7 @@
  * Firmware addresses carry the Thumb bit, or the linker emits BLX.
  */
 fw_step_on       = 0x080113df;  /* (seq, track, step, pad) -> the on byte of a step */
+fw_step_on_set   = 0x080115b9;  /* (seq, track, on, step, pad): writes 0 or 1 */
 fw_rng_next      = 0x0801d1d9;  /* (seq): advance the LCG at seq+4 */
 fw_rand_get      = 0x080113b1;  /* (seq, track or -1) -> Randomness knob value */
 fw_rand_set      = 0x08011577;  /* (seq, track or -1, value) */
@@ -43,6 +44,7 @@ fw_step_map          = 0x08013ca3;  /* (seq, track, step, pad) -> the step as pl
 fw_led               = 0x0801af31;  /* (leds, step button 0..15, colour) */
 fw_strip_set         = 0x080125c1;  /* (seq, zone 0/1/2/4/8, send cc): what the touch strip reads */
 fw_knob_show         = 0x0801fac5;  /* (buttons, knob id, 1): put that knob's value on the display */
+fw_knob_touch        = 0x0801f6d9;  /* (buttons, knob id, touched): a knob's touch sensor */
 fw_swing_get         = 0x080159bb;  /* (seq, track or -1) -> 50..75 */
 fw_swing_set         = 0x08015b4b;  /* (seq, track or -1, value) */
 fw_swing_shown       = 0x08012655;  /* (seq, track or -1) -> the swing in effect */

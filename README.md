@@ -6,8 +6,8 @@ Not made or supported by Arturia.
 **Patch page: <https://angellinares.github.io/bstp_firmware_explore/>**
 
 The page turns Arturia's own update file into a modified one, in your browser.
-You supply `BeatStepPro_Firmware_Update_2_0_1_6.led` from Arturia's downloads;
-nothing is uploaded, and the page only offers a file that is byte for byte a
+You supply `BeatStepPro_Firmware_Update_2_0_1_6.led` from Arturia's downloads.
+Nothing is uploaded, and the page only offers a file that is byte for byte a
 build tested here. You install it with MIDI Control Center, like any update.
 
 > Modified firmware can leave your unit unusable, and you install it at your own
@@ -18,18 +18,18 @@ build tested here. You install it with MIDI Control Center, like any update.
 
 ## The mods
 
-| Mod | What it does | Status |
+| Mod | What it does | On a device |
 |---|---|---|
-| Step chance and conditions | Hold a step and turn **Randomness** to give it a chance to play, or **Probability** to give it a condition: `1-2` plays on pass 1 of every 2, `n13` on every pass but pass 1 of every 3, `1St` on the first pass only, up to `4-4`. On SEQ1, SEQ2 and, since 1.2.1, on DRUM steps of the selected pad. Saved with the pattern. | Runs on one unit |
-| Ratchets (version 1.3.2 of the mod above) | A DRUM step plays 2, 4 or 8 times inside its own length: hold the step and touch the roller strip, or record a roll finer than the track. Ratcheted steps light cyan. | Built, not yet run on a device; the page offers 1.2.1 until it is |
-| Chords | Up to four notes on a SEQ1 or SEQ2 step, with chance and conditions. | Built, not yet run on a device; not on the page until it is |
+| Step chance and conditions | Hold a step and turn **Randomness** to give it a chance to play, or **Probability** to give it a condition: `1-2` plays on pass 1 of every 2, `n13` on every pass but pass 1 of every 3, `1St` on the first pass only, up to `4-4`. On SEQ1, SEQ2 and, since 1.2.1, on DRUM steps of the selected pad. Saved with the pattern. From 1.4.0, steps with a chance or a condition blink. | 1.4.7 runs on one unit. The patch page offers 1.2.1, which also ran on that unit. |
+| Ratchets (part of the mod above since 1.3.0) | A DRUM step plays 2, 4 or 8 times inside its own length: hold the step and touch the roller strip, or record a roll finer than the track. Ratcheted steps light cyan. | 1.4.7 runs on one unit. Checked: setting a ratchet with the strip, recording a roll, the cyan light, and the ratchet after save and power cycle. Not yet checked: the timing of the hits, external clock, and pattern or project copy. Not on the patch page yet. |
+| Chords | Up to four notes on a SEQ1 or SEQ2 step, with chance and conditions. From 1.5.0, pads pressed together while recording make a chord. | 1.4.7 runs on one unit, as reported: chord entry, playback, per-note velocity and saving. 1.5.0 is built, and it has not run on a device. Not on the patch page yet. |
 
 How to use each mod, with figures, is under "How to use it" on the patch page.
 The text is the `guide` in [`patches/mods.json`](patches/mods.json). The
 figures come from `tools/gen_figures.py`, which reads the chance values and the
 conditions from `patches/trig.c`.
 
-Versions and their changes are in [`patches/mods.json`](patches/mods.json); every
+Versions and their changes are in [`patches/mods.json`](patches/mods.json). Every
 version built, with the SHA-256 of its update file, is in
 [`patches/releases.txt`](patches/releases.txt). The mod and version are also
 written into the firmware itself: `tools/led.py info FILE` prints them.
@@ -55,11 +55,11 @@ python tools/build_patch.py out/bsp_2.0.1.6.bin BeatStepPro_Firmware_Update_2_0_
 python -m pytest
 ```
 
-Building needs Python with `ziglang` (a bundled C compiler); the tests need
+Building needs Python with `ziglang` (a bundled C compiler). The tests need
 `unicorn` and `pytest`.
 
 ## How far to trust it
 
 The tests prove what the patch code computes. They do not prove the device
-behaves: that is only known for the versions marked as run on a unit, and only
+behaves. That is only known for the versions marked as run on a unit, and only
 on that one unit.

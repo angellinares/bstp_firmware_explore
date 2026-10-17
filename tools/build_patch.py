@@ -60,6 +60,10 @@ TRIG = [
     (0x0801E2FE, 0x080136A8, "drum_played"),
     (0x0801691A, 0x08027DBC, "drum_merge"),
     (0x0800692C, 0x08012728, "drum_events"),
+    (0x08018B02, 0x080115B8, "press_on"),
+    (0x0802D224, 0x0801F6D8, "ui_knob_touch"),
+] + [(site, 0x0801FAC4, "ui_knob_show") for site in (0x0802C0E0, 0x0802C168, 0x0802C1EA, 0x0802C380, 0x0802C402, 0x0802C484)
+] + [
     (0x08008A1A, 0x080113DE, "led_step_on"),
     (0x08008B5A, 0x080113DE, "led_step_on"),
     (0x0802C0D2, 0x080159BA, "ui_swing_get"),
@@ -90,6 +94,7 @@ POLY = (
         0x0800B91E, 0x0800DE12, 0x0800E116, 0x0800E8FA)]
     + [(0x0801BF18, 0x08013B48, "poly_step_note"),
        (0x0801BF46, 0x08010EEA, "poly_step_velocity")]
+    + [(site, 0x080115B8, "poly_rec_step") for site in (0x0802D83A, 0x0802D96E, 0x0802DA40)]
 )
 # feature -> (sources, compiler defines, redirects, first address of its code)
 # dump fits the image's last block, which the stock update already sends as
